@@ -1,0 +1,30 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+
+# Training artifacts
+*.log
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+runs/
+logs/
+wandb/
+
+# Local dataset downloads
+input.txt
