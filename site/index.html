@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A visual, practical course for building, fine-tuning, and quantizing language models on an Apple-silicon Mac."
+    />
+    <meta name="theme-color" content="#0b0e17" />
+    <title>Mac LLM Lab — learn by building</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the course</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Mac LLM Lab home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Mac LLM Lab</span>
+      </a>
+      <nav aria-label="Course navigation">
+        <a href="#pretrain">Pretrain</a>
+        <a href="#finetune">Fine-tune</a>
+        <a href="#quantize">Quantize</a>
+        <a href="#run-it">Run it</a>
+      </nav>
+      <button class="theme-button" id="theme-button" type="button" aria-label="Switch color theme">
+        <span class="theme-icon" aria-hidden="true">◐</span>
+      </button>
+    </header>
+
+    <main id="main">
+      <section class="hero section-shell" id="top">
+        <div class="eyebrow"><span class="live-dot"></span> designed for your M5 Pro · 48 GB</div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>Don’t just <em>use</em> an LLM.<br />Watch one learn.</h1>
+            <p class="hero-lede">
+              Build a modern 57M-parameter language model from random weights, teach it a new
+              behavior, then compress it to 4-bit — entirely on one Mac.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#run-it">Start the first lab</a>
+              <a class="button button-quiet" href="#map">See the learning map <span>↓</span></a>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="Tokens flowing through a small transformer">
+            <div class="token-river" aria-hidden="true">
+              <span style="--i: 0">Once</span>
+              <span style="--i: 1">upon</span>
+              <span style="--i: 2">a</span>
+              <span style="--i: 3">time</span>
+              <span style="--i: 4" class="token-prediction">?</span>
+            </div>
+            <div class="model-core">
+              <span class="core-orbit orbit-one"></span>
+              <span class="core-orbit orbit-two"></span>
+              <div class="core-label">
+                <strong>57M</strong>
+                <span>learnable weights</span>
+              </div>
+            </div>
+            <div class="prediction-stack" aria-hidden="true">
+              <div><span>the</span><i style="--p: 72%"></i><b>72%</b></div>
+              <div><span>there</span><i style="--p: 18%"></i><b>18%</b></div>
+              <div><span>tiny</span><i style="--p: 10%"></i><b>10%</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fact-strip" aria-label="Course facts">
+          <div><strong>3</strong><span>hands-on acts</span></div>
+          <div><strong>100%</strong><span>local computation</span></div>
+          <div><strong>MLX</strong><span>native Apple silicon</span></div>
+          <div><strong>0 → 1</strong><span>random weights to stories</span></div>
+        </div>
+      </section>
+
+      <section class="map section-shell" id="map">
+        <div class="section-heading narrow-heading">
+          <p class="section-kicker">The learning map</p>
+          <h2>Three acts. One model you understand.</h2>
+          <p>
+            Each act produces a real artifact you can run, inspect, and compare. Follow the bright
+            line from raw text to a small local model.
+          </p>
+        </div>
+
+        <div class="course-map" aria-label="Three-part course roadmap">
+          <article class="map-act act-pretrain">
+            <div class="act-number">01</div>
+            <div class="act-art" aria-hidden="true">
+              <span class="raw-page">text</span>
+              <span class="map-arrow">→</span>
+              <span class="weight-cloud"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+            <p class="act-tag">Build intelligence</p>
+            <h3>Pretrain</h3>
+            <p>Stream stories, train a tokenizer, and turn random numbers into next-token skill.</p>
+            <a href="#pretrain">Open act one <span>↘</span></a>
+          </article>
+
+          <article class="map-act act-finetune">
+            <div class="act-number">02</div>
+            <div class="act-art adapter-art" aria-hidden="true">
+              <span class="frozen-block">W</span>
+              <span class="plus-sign">+</span>
+              <span class="adapter-block">A·B</span>
+            </div>
+            <p class="act-tag">Shape behavior</p>
+            <h3>Fine-tune</h3>
+            <p>Update every weight in your small model, then teach Qwen3-4B with tiny adapters.</p>
+            <a href="#finetune">Open act two <span>↘</span></a>
+          </article>
+
+          <article class="map-act act-quantize">
+            <div class="act-number">03</div>
+            <div class="act-art bit-art" aria-hidden="true">
+              <span>32</span><i></i><i></i><i></i><span>4</span>
+            </div>
+            <p class="act-tag">Shrink the weights</p>
+            <h3>Quantize</h3>
+            <p>Trade a little numerical precision for a much smaller, easier-to-run checkpoint.</p>
+            <a href="#quantize">Open act three <span>↘</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="preset-section section-shell" aria-labelledby="preset-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="section-kicker">Choose your experiment</p>
+            <h2 id="preset-title">The best model is the one you’ll finish.</h2>
+          </div>
+          <p>
+            Memory is not the main limit on this Mac — waiting is. Pick a preset to see exactly
+            what changes.
+          </p>
+        </div>
+
+        <div class="preset-lab">
+          <div class="segmented-control" role="group" aria-label="Model preset">
+            <button type="button" data-preset="quick">Quick</button>
+            <button class="is-selected" type="button" data-preset="standard">Standard</button>
+            <button type="button" data-preset="overnight">Overnight</button>
+          </div>
+
+          <div class="preset-stage">
+            <div class="preset-model" aria-hidden="true">
+              <div class="layer-stack" id="layer-stack"></div>
+              <div class="stack-caption"><span id="stack-layers">12</span> transformer layers</div>
+            </div>
+            <div class="preset-readout" aria-live="polite">
+              <p class="preset-name" id="preset-name">Standard · recommended</p>
+              <div class="big-number"><span id="preset-params">56.9</span><small>M parameters</small></div>
+              <p id="preset-purpose">The practical center: coherent tiny stories and a real afternoon training run.</p>
+              <dl class="preset-metrics">
+                <div><dt>Tokens seen</dt><dd id="preset-tokens">82M</dd></div>
+                <div><dt>Context</dt><dd id="preset-context">512</dd></div>
+                <div><dt>Planning time</dt><dd id="preset-time">3–8 h</dd></div>
+              </dl>
+              <div class="time-track" aria-label="Relative training time">
+                <span id="time-fill"></span>
+              </div>
+              <p class="fine-print">Planning range, not a benchmark. Your first report measures actual tokens/second.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="act-section pretrain-section" id="pretrain">
+        <div class="section-shell">
+          <div class="act-heading">
+            <span class="giant-number" aria-hidden="true">01</span>
+            <div>
+              <p class="section-kicker">Pretrain from scratch</p>
+              <h2>Language becomes a prediction game.</h2>
+              <p>
+                The model never receives a grammar book. It sees a piece of text, predicts the next
+                piece, measures how wrong it was, and adjusts millions of weights — over and over.
+              </p>
+            </div>
+          </div>
+
+          <article class="lab token-lab" aria-labelledby="token-lab-title">
+            <div class="lab-copy">
+              <span class="lab-label">Interactive lab · 01</span>
+              <h3 id="token-lab-title">One sentence becomes many lessons.</h3>
+              <p>
+                Type a short sentence. The preview cuts it into token-shaped pieces, then shifts the
+                target one place left. Every column is one supervised prediction.
+              </p>
+              <label for="token-input">Try your own sentence</label>
+              <input id="token-input" type="text" value="Once upon a little time" maxlength="72" />
+              <p class="fine-print">Concept preview. The real BPE vocabulary is trained by <code>macllm prepare</code>.</p>
+            </div>
+            <div class="lab-stage token-stage">
+              <div class="shift-labels" aria-hidden="true"><span>input</span><span>target</span></div>
+              <div class="token-grid" id="token-grid" aria-live="polite"></div>
+              <div class="lesson-count"><strong id="lesson-count">4</strong> predictions in one forward pass</div>
+            </div>
+          </article>
+
+          <article class="lab attention-lab" aria-labelledby="attention-lab-title">
+            <div class="lab-copy">
+              <span class="lab-label">Interactive lab · 02</span>
+              <h3 id="attention-lab-title">The causal mask prevents cheating.</h3>
+              <p>
+                Select the token currently “thinking.” It may gather information from itself and
+                everything before it, but never from the answer hiding in the future.
+              </p>
+              <label for="query-position">Current token: <strong id="query-token">little</strong></label>
+              <input id="query-position" type="range" min="0" max="4" value="3" />
+              <div class="mask-legend"><span><i class="visible-key"></i> visible</span><span><i></i> hidden</span></div>
+            </div>
+            <div class="lab-stage attention-stage">
+              <div class="attention-matrix" id="attention-matrix" role="img" aria-label="Causal attention visibility matrix"></div>
+              <p id="attention-detail" class="attention-detail" aria-live="polite"></p>
+            </div>
+          </article>
+
+          <article class="architecture" aria-labelledby="architecture-title">
+            <div class="architecture-copy">
+              <span class="lab-label">Inside one transformer block</span>
+              <h3 id="architecture-title">Communicate. Compute. Remember.</h3>
+              <p id="architecture-detail">
+                Attention lets tokens exchange context. Select a stage to follow one update through
+                the residual stream.
+              </p>
+              <div class="architecture-controls" role="group" aria-label="Transformer stage">
+                <button class="is-selected" type="button" data-architecture="attention">1 · Communicate</button>
+                <button type="button" data-architecture="ffn">2 · Compute</button>
+                <button type="button" data-architecture="residual">3 · Remember</button>
+              </div>
+            </div>
+            <div class="block-diagram" id="block-diagram" aria-label="Interactive transformer block diagram">
+              <div class="residual-rail"><span>residual stream</span></div>
+              <div class="block-node node-norm-one">RMSNorm</div>
+              <div class="block-node node-attention is-active">Grouped-query<br />attention</div>
+              <div class="merge-node merge-one">+</div>
+              <div class="block-node node-norm-two">RMSNorm</div>
+              <div class="block-node node-ffn">SwiGLU<br />feed-forward</div>
+              <div class="merge-node merge-two">+</div>
+              <div class="flow-line line-one"></div>
+              <div class="flow-line line-two"></div>
+            </div>
+          </article>
+
+          <article class="lab loss-lab" aria-labelledby="loss-title">
+            <div class="lab-copy">
+              <span class="lab-label">Interactive lab · 03</span>
+              <h3 id="loss-title">Loss tells a story — if you read both lines.</h3>
+              <p>Switch between common training shapes. The validation line is your closed-book quiz.</p>
+              <div class="loss-controls" role="group" aria-label="Loss curve scenario">
+                <button class="is-selected" type="button" data-loss="healthy">Healthy</button>
+                <button type="button" data-loss="overfit">Overfitting</button>
+                <button type="button" data-loss="underfit">Underfitting</button>
+              </div>
+              <p class="diagnosis" id="loss-diagnosis" aria-live="polite">
+                Both lines fall and remain close: useful patterns transfer to unseen stories.
+              </p>
+            </div>
+            <div class="lab-stage chart-stage">
+              <svg id="loss-chart" viewBox="0 0 720 340" role="img" aria-labelledby="loss-chart-title loss-chart-desc">
+                <title id="loss-chart-title">Training and validation loss</title>
+                <desc id="loss-chart-desc">A line chart showing healthy training where both losses decrease.</desc>
+                <g class="chart-grid"></g>
+                <text class="axis-title" x="28" y="28">loss</text>
+                <text class="axis-title" x="650" y="326">steps</text>
+                <path class="loss-line train-line" id="train-line"></path>
+                <path class="loss-line valid-line" id="valid-line"></path>
+                <circle class="line-end train-end" id="train-end" r="5"></circle>
+                <circle class="line-end valid-end" id="valid-end" r="5"></circle>
+                <text class="line-label train-label" id="train-label">train</text>
+                <text class="line-label valid-label" id="valid-label">validation</text>
+              </svg>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="act-section finetune-section" id="finetune">
+        <div class="section-shell">
+          <div class="act-heading">
+            <span class="giant-number" aria-hidden="true">02</span>
+            <div>
+              <p class="section-kicker">Fine-tune two ways</p>
+              <h2>Same objective. Different amount of change.</h2>
+              <p>
+                Fine-tuning is still next-token prediction. What changes is the dataset — and how
+                many weights you allow the optimizer to touch.
+              </p>
+            </div>
+          </div>
+
+          <div class="tune-comparison">
+            <article class="tune-path full-path">
+              <div class="path-heading">
+                <div><span>Our model</span><strong>Full fine-tune</strong></div>
+                <span class="path-badge">57M trainable</span>
+              </div>
+              <div class="weight-field all-trainable" id="full-weight-field" aria-label="All model weights are trainable"></div>
+              <p>Small enough to update every weight. Simple, direct, and able to reshape the whole model.</p>
+              <dl>
+                <div><dt>Base</dt><dd>Your story model</dd></div>
+                <div><dt>Memory</dt><dd>Comfortable</dd></div>
+                <div><dt>Risk</dt><dd>Forgetting old behavior</dd></div>
+              </dl>
+            </article>
+
+            <div class="comparison-word" aria-hidden="true">vs</div>
+
+            <article class="tune-path lora-path">
+              <div class="path-heading">
+                <div><span>Qwen3-4B</span><strong>QLoRA</strong></div>
+                <span class="path-badge">tiny adapters</span>
+              </div>
+              <div class="weight-field mostly-frozen" id="lora-weight-field" aria-label="Frozen base weights with a few trainable adapters"></div>
+              <p>A 4-bit base stays frozen while compact A and B matrices learn the new behavior.</p>
+              <dl>
+                <div><dt>Base</dt><dd>Capable open model</dd></div>
+                <div><dt>Memory</dt><dd>Fits 48 GB easily</dd></div>
+                <div><dt>Result</dt><dd>Small adapter files</dd></div>
+              </dl>
+            </article>
+          </div>
+
+          <div class="mask-explainer">
+            <div>
+              <span class="lab-label">Prompt masking</span>
+              <h3>Teach the answer, not the question.</h3>
+              <p>The prompt provides context. Only completion tokens contribute to the fine-tuning loss.</p>
+            </div>
+            <div class="mask-tokens" aria-label="Prompt tokens masked and completion tokens trained">
+              <span class="masked">Write</span><span class="masked">a</span><span class="masked">story</span><span class="masked">:</span>
+              <span class="trained">Pip</span><span class="trained">planted</span><span class="trained">a</span><span class="trained">seed</span>
+              <div class="mask-brace prompt-brace">context · no loss</div>
+              <div class="mask-brace answer-brace">answer · learn here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="act-section quantize-section" id="quantize">
+        <div class="section-shell">
+          <div class="act-heading">
+            <span class="giant-number" aria-hidden="true">03</span>
+            <div>
+              <p class="section-kicker">Quantize the result</p>
+              <h2>Fewer bits. Smaller model. Measured trade-off.</h2>
+              <p>
+                Quantization replaces precise floating-point weights with a small set of levels.
+                The model becomes lighter, but each weight is now an approximation.
+              </p>
+            </div>
+          </div>
+
+          <article class="quant-lab" aria-labelledby="quant-title">
+            <div class="quant-controls">
+              <span class="lab-label">Interactive lab · 04</span>
+              <h3 id="quant-title">Turn the precision dial.</h3>
+              <p>
+                Choose a bit width for the 56.9M-parameter model. The estimate includes a small
+                allowance for group scales and metadata.
+              </p>
+              <div class="bit-buttons" role="group" aria-label="Quantization bit width">
+                <button type="button" data-bits="8">8-bit</button>
+                <button type="button" data-bits="6">6-bit</button>
+                <button class="is-selected" type="button" data-bits="4">4-bit</button>
+                <button type="button" data-bits="3">3-bit</button>
+              </div>
+              <p class="quant-caution" id="quant-caution">The practical default: strong compression with usually modest quality change.</p>
+            </div>
+
+            <div class="quant-stage">
+              <div class="size-comparison">
+                <div class="size-column original-size">
+                  <span class="size-label">training checkpoint</span>
+                  <div class="size-vessel"><span></span></div>
+                  <strong>217</strong><small>MiB · FP32 estimate</small>
+                </div>
+                <div class="compression-arrow" aria-hidden="true"><span>→</span><small id="compression-ratio">6.7× smaller</small></div>
+                <div class="size-column quantized-size">
+                  <span class="size-label" id="quant-label">4-bit MLX</span>
+                  <div class="size-vessel"><span id="quant-vessel"></span></div>
+                  <strong id="quant-size">32</strong><small>MiB · estimated</small>
+                </div>
+              </div>
+              <div class="levels-visual" id="levels-visual" aria-label="Available integer levels at selected bit width"></div>
+              <p><strong id="level-count">16</strong> possible weight levels instead of billions of floating-point values.</p>
+            </div>
+          </article>
+
+          <div class="fair-test">
+            <div>
+              <p class="section-kicker">The fair test</p>
+              <h3>Hold everything else still.</h3>
+            </div>
+            <ol>
+              <li><span>01</span>Same ten prompts</li>
+              <li><span>02</span>Same seed and temperature</li>
+              <li><span>03</span>Compare size, speed, and answers</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="run-section section-shell" id="run-it">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="section-kicker">Your first real run</p>
+            <h2>From zero to generated text.</h2>
+          </div>
+          <p>Run these four commands from the repository root. Start small; understanding compounds.</p>
+        </div>
+
+        <ol class="run-steps">
+          <li>
+            <div class="step-meta"><span>01</span><strong>Enter the environment</strong><small>Use the installed local dependencies.</small></div>
+            <div class="command-block"><code>source .venv/bin/activate</code><button type="button" data-copy="source .venv/bin/activate">Copy</button></div>
+          </li>
+          <li>
+            <div class="step-meta"><span>02</span><strong>Prepare stories</strong><small>Stream text, train BPE, write token IDs.</small></div>
+            <div class="command-block"><code>macllm prepare --preset quick</code><button type="button" data-copy="macllm prepare --preset quick">Copy</button></div>
+          </li>
+          <li>
+            <div class="step-meta"><span>03</span><strong>Train the model</strong><small>About 8M weights for the first complete pass.</small></div>
+            <div class="command-block"><code>macllm train --preset quick</code><button type="button" data-copy="macllm train --preset quick">Copy</button></div>
+          </li>
+          <li>
+            <div class="step-meta"><span>04</span><strong>Ask it to continue</strong><small>Your checkpoint generates locally on Metal.</small></div>
+            <div class="command-block"><code>macllm generate --checkpoint runs/quick --prompt "Once upon a time"</code><button type="button" data-copy='macllm generate --checkpoint runs/quick --prompt "Once upon a time"'>Copy</button></div>
+          </li>
+        </ol>
+
+        <div class="next-journey">
+          <div>
+            <span class="eyebrow">When quick works</span>
+            <h3>Move to the 57M standard model.</h3>
+            <p>It is the recommended balance of learning value, story quality, and a reasonable M5 Pro wait.</p>
+          </div>
+          <div class="next-command">
+            <code>macllm prepare --preset standard<br />macllm train --preset standard</code>
+            <button type="button" data-copy="macllm prepare --preset standard&#10;macllm train --preset standard">Copy both</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="principles section-shell" aria-labelledby="principles-title">
+        <div class="section-heading narrow-heading">
+          <p class="section-kicker">Keep your conclusions honest</p>
+          <h2 id="principles-title">Three rules for learning from the experiment.</h2>
+        </div>
+        <div class="principle-grid">
+          <article><span>1</span><h3>Small is not general.</h3><p>TinyStories can teach coherent simple English. It cannot create a broad assistant from laptop-scale pretraining.</p></article>
+          <article><span>2</span><h3>Validation beats vibes.</h3><p>A pretty sample may be luck. Track held-out loss and fixed prompts across checkpoints.</p></article>
+          <article><span>3</span><h3>Change one variable.</h3><p>Keep data, seed, and prompts fixed when comparing model size, fine-tuning, or quantization.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div>
+        <strong>Mac LLM Lab</strong>
+        <p>Build it small. See every step. Keep it local.</p>
+      </div>
+      <nav aria-label="Project resources">
+        <a href="../README.md">Written tutorial</a>
+        <a href="../docs/concepts.md">Concepts</a>
+        <a href="../src/macllm/model.py">Model source</a>
+        <a href="../docs/troubleshooting.md">Troubleshooting</a>
+      </nav>
+    </footer>
+  </body>
+</html>
