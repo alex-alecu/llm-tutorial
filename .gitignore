@@ -1,1 +1,10 @@
-/.DS_Store
+.DS_Store
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+data/prepared/
+runs/
+mlx_model/
+adapters/
+fused_model/
