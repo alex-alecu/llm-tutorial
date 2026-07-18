@@ -163,7 +163,6 @@ a {
 }
 
 .theme-button {
-  justify-self: end;
   width: 38px;
   height: 38px;
   border: 1px solid var(--line);
@@ -171,6 +170,39 @@ a {
   background: var(--surface);
   color: var(--ink);
   cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-self: end;
+}
+
+.github-link {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface), transparent 18%);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.github-link span {
+  color: var(--mint);
+}
+
+.github-link:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--mint), var(--line) 45%);
+  color: var(--ink);
 }
 
 .section-shell {
@@ -2152,6 +2184,19 @@ footer nav a:hover {
 }
 
 @media (max-width: 640px) {
+  .github-link {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+    color: transparent;
+    font-size: 0;
+  }
+
+  .github-link span {
+    font-size: 0.9rem;
+  }
+
   .lesson-outcomes,
   .code-reading-map,
   .chapter-pager,

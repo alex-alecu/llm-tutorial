@@ -14,6 +14,20 @@ courseThemeButton?.addEventListener("click", () => {
   );
 });
 
+const chapterHeader = document.querySelector(".chapter-header");
+if (chapterHeader && courseThemeButton) {
+  const actions = document.createElement("div");
+  actions.className = "header-actions";
+  const githubLink = document.createElement("a");
+  githubLink.className = "github-link";
+  githubLink.href = "https://github.com/alex-alecu/llm-tutorial";
+  githubLink.target = "_blank";
+  githubLink.rel = "noreferrer";
+  githubLink.innerHTML = 'GitHub <span aria-hidden="true">↗</span>';
+  courseThemeButton.before(actions);
+  actions.append(githubLink, courseThemeButton);
+}
+
 document.querySelectorAll("[data-copy]").forEach((button) => {
   button.addEventListener("click", async () => {
     await navigator.clipboard.writeText(button.dataset.copy);
