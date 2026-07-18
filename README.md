@@ -4,14 +4,14 @@ Build, fine-tune, and shrink language models on one Apple-silicon Mac. The code 
 
 ## Open the visual course
 
-The interactive course is plain HTML, CSS, and JavaScript: no framework, package install, or build step.
+The interactive course is plain HTML, CSS, and JavaScript: no framework, package install, or build step. Serve it from the repository root so each chapter can display the exact current Python source beside its explanation.
 
 ```bash
 python3 -m http.server 8000
 open http://localhost:8000/site/
 ```
 
-The implementation stays deliberately small as well: the complete modern model is about 100 lines in [`src/macllm/model.py`](src/macllm/model.py), and each remaining file teaches one stage of the pipeline.
+Start with the vocabulary introduction, then follow the chapter sequence. Pretraining is split into data, transformer, and optimization chapters; fine-tuning, quantization, generation, and the complete command map each have their own page. The implementation stays deliberately small: the complete modern model is about 100 lines in [`src/macllm/model.py`](src/macllm/model.py), and every Python file under `src/macllm/` and `tests/` appears in the course with reading notes.
 
 This course is tuned for the **M5 Pro with 48 GB unified memory** in this repository's development machine. It uses [Apple MLX](https://ml-explore.github.io/mlx/) because MLX runs directly on Apple silicon and lets the CPU and GPU share memory without copies.
 
@@ -112,7 +112,7 @@ macllm finetune \
 
 macllm generate \
   --checkpoint runs/standard-story-tuned \
-  --prompt "Write a tiny story about a patient robot.\nStory:" \
+  --prompt $'Write a tiny story about a patient robot.\nStory:' \
   --max-new-tokens 180
 ```
 
@@ -154,7 +154,7 @@ macllm quantize \
 
 macllm generate \
   --checkpoint runs/standard-story-tuned-4bit \
-  --prompt "Write a tiny story about a patient robot.\nStory:" \
+  --prompt $'Write a tiny story about a patient robot.\nStory:' \
   --temperature 0
 ```
 

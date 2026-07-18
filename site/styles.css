@@ -1676,6 +1676,508 @@ footer nav a:hover {
   color: var(--ink);
 }
 
+/* Chaptered code course */
+.reading-progress {
+  position: fixed;
+  z-index: 80;
+  inset: 0 auto auto 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--mint), var(--violet));
+}
+
+.course-body {
+  background:
+    radial-gradient(circle at 82% 8%, color-mix(in srgb, var(--violet), transparent 88%), transparent 26rem),
+    var(--bg);
+}
+
+.chapter-header nav a[aria-current="page"] {
+  color: var(--mint);
+}
+
+.chapter-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 860px);
+  gap: clamp(28px, 5vw, 72px);
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: clamp(44px, 8vw, 96px) 0 110px;
+}
+
+.chapter-nav {
+  position: sticky;
+  top: 104px;
+  align-self: start;
+}
+
+.chapter-nav > p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.chapter-nav ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter-nav a {
+  display: grid;
+  grid-template-columns: 27px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-decoration: none;
+}
+
+.chapter-nav a span {
+  color: color-mix(in srgb, var(--muted), transparent 25%);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.chapter-nav a:hover,
+.chapter-nav a[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.chapter-nav a[aria-current="page"] span {
+  color: var(--mint);
+}
+
+.chapter-main {
+  min-width: 0;
+}
+
+.chapter-hero {
+  margin-bottom: 56px;
+}
+
+.chapter-breadcrumb {
+  color: var(--mint);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-hero h1 {
+  max-width: 760px;
+  margin: 14px 0 20px;
+  font-size: clamp(2.7rem, 7vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+}
+
+.chapter-hero .chapter-lede {
+  max-width: 700px;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+}
+
+.lesson-outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  margin: 34px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--line);
+}
+
+.lesson-outcomes div {
+  padding: 18px;
+  background: var(--surface);
+}
+
+.lesson-outcomes strong,
+.lesson-outcomes span {
+  display: block;
+}
+
+.lesson-outcomes strong {
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.lesson-outcomes span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.lesson-section {
+  margin: 76px 0;
+  scroll-margin-top: 100px;
+}
+
+.lesson-section > h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.75rem, 4vw, 2.7rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.lesson-section > p {
+  max-width: 720px;
+  color: var(--muted);
+}
+
+.concept-callout,
+.practice-card,
+.checkpoint-card {
+  margin: 26px 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.concept-callout {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 22px;
+  padding: 24px;
+}
+
+.concept-callout .term {
+  color: var(--mint);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.concept-callout p {
+  margin: 0;
+}
+
+.practice-card {
+  overflow: hidden;
+}
+
+.practice-copy {
+  padding: 24px;
+}
+
+.practice-copy .practice-label {
+  margin: 0 0 8px;
+  color: var(--peach);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.practice-copy h3 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.practice-copy p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.practice-card .command-block {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.practice-expect {
+  padding: 14px 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.practice-expect strong {
+  color: var(--ink);
+}
+
+.code-reading-map {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.code-note {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface), var(--bg) 20%);
+}
+
+.code-note button {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mint);
+  font: 700 0.72rem/1.4 var(--mono);
+  cursor: pointer;
+}
+
+.code-note h3 {
+  margin: 0 0 7px;
+  font-size: 1rem;
+}
+
+.code-note p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.source-viewer {
+  overflow: hidden;
+  margin: 30px 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #090c13;
+  box-shadow: var(--shadow);
+}
+
+.source-viewer summary {
+  padding: 16px 20px;
+  border-bottom: 1px solid transparent;
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 750;
+  list-style-position: inside;
+}
+
+.source-viewer[open] summary {
+  border-bottom-color: var(--line);
+}
+
+.source-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  border-bottom: 1px solid #252b38;
+  color: #9ca6b8;
+  font: 0.72rem/1.4 var(--mono);
+}
+
+.source-meta a {
+  color: #90f5c5;
+}
+
+.source-viewer pre {
+  max-height: 680px;
+  margin: 0;
+  overflow: auto;
+  tab-size: 4;
+}
+
+.source-viewer code {
+  display: block;
+  min-width: max-content;
+  padding: 14px 0 28px;
+  color: #e9edf5;
+  font: 0.78rem/1.62 var(--mono);
+  counter-reset: source-line;
+}
+
+.source-line {
+  position: relative;
+  display: block;
+  min-height: 1.62em;
+  padding: 0 22px 0 66px;
+  white-space: pre;
+  counter-increment: source-line;
+}
+
+.source-line::before {
+  position: absolute;
+  left: 0;
+  width: 48px;
+  color: #596274;
+  content: counter(source-line);
+  text-align: right;
+  user-select: none;
+}
+
+.source-line.is-focused {
+  background: color-mix(in srgb, #90f5c5, transparent 88%);
+  box-shadow: inset 3px 0 #90f5c5;
+}
+
+.source-load-failed pre {
+  display: none;
+}
+
+.source-load-failed .source-meta {
+  display: block;
+  padding: 18px;
+  color: #ffad8b;
+}
+
+.checkpoint-card {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--mint-soft), var(--surface));
+}
+
+.checkpoint-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.checkpoint-card p {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.chapter-pager {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 80px;
+}
+
+.chapter-pager a {
+  display: block;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.chapter-pager a:last-child {
+  text-align: right;
+}
+
+.chapter-pager span,
+.chapter-pager strong {
+  display: block;
+}
+
+.chapter-pager span {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.chapter-pager a:hover strong {
+  color: var(--mint);
+}
+
+.vocabulary-section {
+  padding: 108px 0;
+}
+
+.vocabulary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 36px;
+}
+
+.vocabulary-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.vocabulary-card dt {
+  margin-bottom: 8px;
+  color: var(--mint);
+  font-family: var(--mono);
+  font-weight: 800;
+}
+
+.vocabulary-card dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.course-start {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--mint-soft);
+}
+
+.course-start p {
+  max-width: 600px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .chapter-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-nav {
+    position: static;
+    overflow-x: auto;
+  }
+
+  .chapter-nav ol {
+    display: flex;
+    width: max-content;
+  }
+
+  .chapter-nav a {
+    min-width: 150px;
+  }
+
+  .vocabulary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .lesson-outcomes,
+  .code-reading-map,
+  .chapter-pager,
+  .vocabulary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .concept-callout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .chapter-pager a:last-child {
+    text-align: left;
+  }
+
+  .course-start {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .source-viewer code {
+    font-size: 0.7rem;
+  }
+}
+
 @media (max-width: 900px) {
   .site-header {
     grid-template-columns: 1fr auto;

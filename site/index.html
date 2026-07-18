@@ -21,10 +21,10 @@
         <span>Mac LLM Lab</span>
       </a>
       <nav aria-label="Course navigation">
-        <a href="#pretrain">Pretrain</a>
-        <a href="#finetune">Fine-tune</a>
-        <a href="#quantize">Quantize</a>
-        <a href="#run-it">Run it</a>
+        <a href="#vocabulary">Vocabulary</a>
+        <a href="chapters/01-data.html">Pretrain</a>
+        <a href="chapters/04-finetune.html">Fine-tune</a>
+        <a href="chapters/06-generate.html">Run it</a>
       </nav>
       <button class="theme-button" id="theme-button" type="button" aria-label="Switch color theme">
         <span class="theme-icon" aria-hidden="true">◐</span>
@@ -42,7 +42,7 @@
               behavior, then compress it to 4-bit — entirely on one Mac.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="#run-it">Start the first lab</a>
+              <a class="button button-primary" href="#vocabulary">Learn the language first</a>
               <a class="button button-quiet" href="#map">See the learning map <span>↓</span></a>
             </div>
           </div>
@@ -79,6 +79,39 @@
         </div>
       </section>
 
+      <section class="vocabulary-section section-shell" id="vocabulary" aria-labelledby="vocabulary-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="section-kicker">Before the terminal</p>
+            <h2 id="vocabulary-title">The small vocabulary behind every LLM.</h2>
+          </div>
+          <p>
+            You do not need machine-learning experience. Learn these objects once, then watch them
+            reappear in the data, model, training, fine-tuning, quantization, and generation code.
+          </p>
+        </div>
+
+        <dl class="vocabulary-grid">
+          <div class="vocabulary-card"><dt>Token</dt><dd>A reusable piece of text represented by an integer—not necessarily a complete word.</dd></div>
+          <div class="vocabulary-card"><dt>Vocabulary</dt><dd>The fixed table of token pieces the tokenizer can encode and decode.</dd></div>
+          <div class="vocabulary-card"><dt>Tensor</dt><dd>A multidimensional array holding token IDs, vectors, scores, weights, or gradients.</dd></div>
+          <div class="vocabulary-card"><dt>Parameter</dt><dd>One learned number inside the model. A 57M model has roughly 57 million of them.</dd></div>
+          <div class="vocabulary-card"><dt>Context</dt><dd>The tokens currently visible to a prediction; this course uses 256- or 512-token windows.</dd></div>
+          <div class="vocabulary-card"><dt>Logit</dt><dd>An unnormalized score for one possible next token. Larger means more preferred.</dd></div>
+          <div class="vocabulary-card"><dt>Loss</dt><dd>A single error score. Training tries to lower it; validation checks whether learning transfers.</dd></div>
+          <div class="vocabulary-card"><dt>Gradient</dt><dd>The direction each parameter should move to reduce the current loss.</dd></div>
+          <div class="vocabulary-card"><dt>Optimizer</dt><dd>The rule that converts gradients into careful weight updates; here it is AdamW.</dd></div>
+          <div class="vocabulary-card"><dt>Checkpoint</dt><dd>Saved weights, model configuration, and tokenizer: everything needed to run again.</dd></div>
+          <div class="vocabulary-card"><dt>Fine-tuning</dt><dd>Continuing next-token training on a small dataset shaped around a desired behavior.</dd></div>
+          <div class="vocabulary-card"><dt>Inference</dt><dd>Using frozen weights to predict or generate, without backpropagation or updates.</dd></div>
+        </dl>
+
+        <div class="course-start">
+          <p><strong>The loop to remember:</strong> tokens go in → logits come out → loss measures error → gradients point downhill → the optimizer changes weights.</p>
+          <a class="button button-primary" href="chapters/00-start.html">Start chapter 00 <span>→</span></a>
+        </div>
+      </section>
+
       <section class="map section-shell" id="map">
         <div class="section-heading narrow-heading">
           <p class="section-kicker">The learning map</p>
@@ -100,7 +133,7 @@
             <p class="act-tag">Build intelligence</p>
             <h3>Pretrain</h3>
             <p>Stream stories, train a tokenizer, and turn random numbers into next-token skill.</p>
-            <a href="#pretrain">Open act one <span>↘</span></a>
+            <a href="chapters/01-data.html">Open pretraining chapters <span>↘</span></a>
           </article>
 
           <article class="map-act act-finetune">
@@ -113,7 +146,7 @@
             <p class="act-tag">Shape behavior</p>
             <h3>Fine-tune</h3>
             <p>Update every weight in your small model, then teach Qwen3-4B with tiny adapters.</p>
-            <a href="#finetune">Open act two <span>↘</span></a>
+            <a href="chapters/04-finetune.html">Open fine-tuning chapter <span>↘</span></a>
           </article>
 
           <article class="map-act act-quantize">
@@ -124,7 +157,7 @@
             <p class="act-tag">Shrink the weights</p>
             <h3>Quantize</h3>
             <p>Trade a little numerical precision for a much smaller, easier-to-run checkpoint.</p>
-            <a href="#quantize">Open act three <span>↘</span></a>
+            <a href="chapters/05-quantize.html">Open quantization chapter <span>↘</span></a>
           </article>
         </div>
       </section>
@@ -440,7 +473,8 @@
           <div>
             <span class="eyebrow">When quick works</span>
             <h3>Move to the 57M standard model.</h3>
-            <p>It is the recommended balance of learning value, story quality, and a reasonable M5 Pro wait.</p>
+            <p>It is the recommended balance of learning value, story quality, and a reasonable M5 Pro wait. Read the code first in the chaptered course.</p>
+            <a class="button button-quiet" href="chapters/00-start.html">Open the complete course <span>→</span></a>
           </div>
           <div class="next-command">
             <code>macllm prepare --preset standard<br />macllm train --preset standard</code>
@@ -469,6 +503,8 @@
         <p>Build it small. See every step. Keep it local.</p>
       </div>
       <nav aria-label="Project resources">
+        <a href="chapters/00-start.html">Code course</a>
+        <a href="chapters/07-code-map.html">Python map</a>
         <a href="../README.md">Written tutorial</a>
         <a href="../docs/concepts.md">Concepts</a>
         <a href="../src/macllm/model.py">Model source</a>

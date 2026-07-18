@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Learn how text becomes tokenizer files and shifted training batches." />
+    <title>Data and tokens · Mac LLM Lab</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../course.js" defer></script>
+  </head>
+  <body class="course-body">
+    <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+    <a class="skip-link" href="#lesson">Skip to the lesson</a>
+    <header class="site-header chapter-header">
+      <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Mac LLM Lab</span></a>
+      <nav aria-label="Course navigation"><a href="../index.html#vocabulary">Vocabulary</a><a aria-current="page" href="01-data.html">Pretrain</a><a href="04-finetune.html">Fine-tune</a><a href="06-generate.html">Run</a></nav>
+      <button class="theme-button" id="theme-button" type="button" aria-label="Switch color theme"><span aria-hidden="true">◐</span></button>
+    </header>
+    <div class="chapter-layout">
+      <nav class="chapter-nav" aria-label="Chapters"><p>Course chapters</p><ol>
+        <li><a href="00-start.html"><span>00</span>Start here</a></li><li><a aria-current="page" href="01-data.html"><span>01</span>Data + tokens</a></li><li><a href="02-model.html"><span>02</span>Transformer</a></li><li><a href="03-training.html"><span>03</span>Pretrain</a></li><li><a href="04-finetune.html"><span>04</span>Fine-tune</a></li><li><a href="05-quantize.html"><span>05</span>Quantize</a></li><li><a href="06-generate.html"><span>06</span>Generate</a></li><li><a href="07-code-map.html"><span>07</span>Code map</a></li>
+      </ol></nav>
+      <main class="chapter-main" id="lesson">
+        <header class="chapter-hero">
+          <p class="chapter-breadcrumb">Chapter 01 · pretrain / data</p>
+          <h1>Text must become numbers.</h1>
+          <p class="chapter-lede">The model never sees words. This chapter streams stories, learns a small byte-pair vocabulary, writes token IDs, and turns one window into input and target tensors.</p>
+          <div class="lesson-outcomes"><div><strong>Prepare</strong><span>train and validation token files</span></div><div><strong>Inspect</strong><span>the one-token prediction shift</span></div><div><strong>Read</strong><span>every line in config.py and data.py</span></div></div>
+        </header>
+
+        <section class="lesson-section" id="prepare">
+          <h2>1. Prepare a tiny practice dataset</h2>
+          <p>TinyStories provides short synthetic stories. We stream 200 training stories for this practice pass, plus the preset’s fixed validation split, keeping the feedback loop smaller than a full run. The complete quick preset comes after you understand the pipeline.</p>
+          <article class="practice-card"><div class="practice-copy"><p class="practice-label">Run · practice pass</p><h3>Download, split, tokenize, encode</h3><p>The output directory is deliberately named <code>practice</code> so it will not collide with the full quick run.</p></div><div class="command-block"><code>source .venv/bin/activate<br />macllm prepare --preset quick --max-stories 200 --output data/prepared/practice</code><button type="button" data-copy="source .venv/bin/activate&#10;macllm prepare --preset quick --max-stories 200 --output data/prepared/practice">Copy</button></div><div class="practice-expect"><strong>Expected:</strong> <code>tokenizer.json</code>, <code>train.bin</code>, <code>valid.bin</code>, and <code>dataset.json</code> under <code>data/prepared/practice/</code>.</div></article>
+          <div class="concept-callout"><span class="term">Why BPE?</span><p>Byte-pair encoding begins with bytes and repeatedly merges common neighboring pieces. It can represent any input while giving frequent patterns such as <code>the</code> or <code>ing</code> compact IDs.</p></div>
+        </section>
+
+        <section class="lesson-section" id="config-code">
+          <h2>2. The knobs live in one place</h2>
+          <p><code>config.py</code> contains model shape and training choices, not learning logic. Presets let us change experiment size without scattering constants through the code.</p>
+          <div class="code-reading-map">
+            <article class="code-note"><button data-focus-source="config-source" data-lines="8-24">Lines 8–24</button><h3>Model shape</h3><p>Vocabulary, vector width, layer count, attention heads, context length, and numerical constants define one transformer.</p></article>
+            <article class="code-note"><button data-focus-source="config-source" data-lines="27-48">Lines 27–48</button><h3>Training recipe</h3><p>Batch size, steps, learning rate, evaluation cadence, data limits, seed, decay, and clipping define one run.</p></article>
+            <article class="code-note"><button data-focus-source="config-source" data-lines="51-107">Lines 51–107</button><h3>Three experiment sizes</h3><p>Quick proves the loop; standard is the practical course model; overnight trades much more waiting for capacity.</p></article>
+            <article class="code-note"><button data-focus-source="config-source" data-lines="110-128">Lines 110–128</button><h3>Validate and save</h3><p>Configurations are checked and serialized beside weights so a checkpoint can reconstruct the exact model.</p></article>
+          </div>
+          <details class="source-viewer" id="config-source" data-python-source="../../src/macllm/config.py"><summary>Complete source · config.py</summary><div class="source-meta"><span data-source-status>Loading exact repository source…</span><a href="../../src/macllm/config.py">Open raw file</a></div><pre><code aria-label="Complete config.py source"></code></pre></details>
+        </section>
+
+        <section class="lesson-section" id="data-code">
+          <h2>3. Follow a story into a batch</h2>
+          <p>The data module has one path from text documents to compact integers and one tiny dataset class that samples random training windows.</p>
+          <div class="code-reading-map">
+            <article class="code-note"><button data-focus-source="data-source" data-lines="16-45">Lines 16–45</button><h3>Obtain documents</h3><p>Local text is split at blank lines; TinyStories is streamed lazily; documents are written with clean separators.</p></article>
+            <article class="code-note"><button data-focus-source="data-source" data-lines="48-60">Lines 48–60</button><h3>Learn the vocabulary</h3><p>A byte-level BPE tokenizer learns frequent pieces from training text only and saves its rules.</p></article>
+            <article class="code-note"><button data-focus-source="data-source" data-lines="63-96">Lines 63–96</button><h3>Encode without filling memory</h3><p>Batches of documents become unsigned 32-bit IDs. An end token separates stories before bytes are flushed to disk.</p></article>
+            <article class="code-note"><button data-focus-source="data-source" data-lines="99-145">Lines 99–145</button><h3>Build train and validation</h3><p>Separate held-out text gives an honest test. Temporary raw text is removed after both splits are encoded.</p></article>
+            <article class="code-note"><button data-focus-source="data-source" data-lines="148-169">Lines 148–169</button><h3>Make the prediction shift</h3><p>Memory mapping avoids loading every token. A random window of length N+1 becomes N inputs and the same window shifted one place as targets.</p></article>
+          </div>
+          <details class="source-viewer" id="data-source" data-python-source="../../src/macllm/data.py" open><summary>Complete source · data.py</summary><div class="source-meta"><span data-source-status>Loading exact repository source…</span><a href="../../src/macllm/data.py">Open raw file</a></div><pre><code aria-label="Complete data.py source"></code></pre></details>
+        </section>
+
+        <section class="lesson-section" id="inspect">
+          <h2>4. Inspect the actual tokens</h2>
+          <p>The input row stops one token earlier; the target row starts one token later. Every column is a supervised next-token question, and the causal mask later prevents answers from leaking left.</p>
+          <article class="practice-card"><div class="practice-copy"><p class="practice-label">Run · inspect</p><h3>See your trained tokenizer’s pieces</h3><p>This is more truthful than splitting on spaces: BPE chooses pieces from the corpus it just read.</p></div><div class="command-block"><code>macllm inspect --data data/prepared/practice --text "Once upon a little time"</code><button type="button" data-copy='macllm inspect --data data/prepared/practice --text "Once upon a little time"'>Copy</button></div><div class="practice-expect"><strong>Expected:</strong> parallel <code>INPUT</code> and <code>TARGET</code> rows, shifted by exactly one token.</div></article>
+        </section>
+
+        <aside class="checkpoint-card"><h2>Checkpoint · explain the files</h2><p>Before moving on, say what each artifact does: <code>tokenizer.json</code> maps text and IDs; <code>train.bin</code> supplies updates; <code>valid.bin</code> tests generalization; <code>dataset.json</code> records provenance and counts.</p><div class="command-block"><code>cat data/prepared/practice/dataset.json</code><button type="button" data-copy="cat data/prepared/practice/dataset.json">Copy</button></div></aside>
+        <nav class="chapter-pager" aria-label="Previous and next chapter"><a href="00-start.html"><span>Previous · Chapter 00</span><strong>← Start here</strong></a><a href="02-model.html"><span>Next · Chapter 02</span><strong>Build the transformer →</strong></a></nav>
+      </main>
+    </div>
+  </body>
+</html>

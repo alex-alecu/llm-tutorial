@@ -24,7 +24,7 @@ Before training, save a baseline:
 ```bash
 macllm generate \
   --checkpoint runs/standard \
-  --prompt "Write a tiny story about a careful fox.\nStory:" \
+  --prompt $'Write a tiny story about a careful fox.\nStory:' \
   --temperature 0
 ```
 
@@ -39,7 +39,7 @@ macllm finetune \
 
 macllm generate \
   --checkpoint runs/standard-story-tuned \
-  --prompt "Write a tiny story about a careful fox.\nStory:" \
+  --prompt $'Write a tiny story about a careful fox.\nStory:' \
   --temperature 0
 ```
 
