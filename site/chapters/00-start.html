@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Set up Mac LLM Lab and learn the vocabulary used throughout the course." />
     <title>Start here · Mac LLM Lab</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../styles.css" />
+    <script src="../highlight.js" defer></script>
     <script src="../course.js" defer></script>
   </head>
   <body class="course-body">
@@ -13,7 +15,7 @@
     <a class="skip-link" href="#lesson">Skip to the lesson</a>
     <header class="site-header chapter-header">
       <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Mac LLM Lab</span></a>
-      <nav aria-label="Course navigation"><a href="../index.html#vocabulary">Vocabulary</a><a href="01-data.html">Pretrain</a><a href="04-finetune.html">Fine-tune</a><a href="06-generate.html">Run</a></nav>
+      <nav aria-label="Course navigation"><a href="../index.html#vocabulary">Start</a><a href="01-data.html">Pretrain</a><a href="04-finetune.html">Fine-tune</a><a href="06-generate.html">Run</a></nav>
       <button class="theme-button" id="theme-button" type="button" aria-label="Switch color theme"><span aria-hidden="true">◐</span></button>
     </header>
 
@@ -34,45 +36,42 @@
 
       <main class="chapter-main" id="lesson">
         <header class="chapter-hero">
-          <p class="chapter-breadcrumb">Chapter 00 · orientation</p>
-          <h1>Know the loop before you run it.</h1>
-          <p class="chapter-lede">An LLM is a next-token predictor. Training repeats one loop: text becomes token IDs, the model predicts, loss scores the prediction, and an optimizer nudges the weights.</p>
+          <p class="chapter-breadcrumb">Chapter 00 · start here</p>
+          <h1>Start with a guess.</h1>
+          <p class="chapter-lede">A language model reads text and guesses the next piece. We will build one, improve its guesses, and run it on this Mac.</p>
           <div class="lesson-outcomes">
-            <div><strong>Understand</strong><span>the five objects that move through the course</span></div>
-            <div><strong>Prepare</strong><span>a clean Python 3.11–3.13 environment</span></div>
-            <div><strong>Verify</strong><span>MLX, Apple silicon, and unified memory</span></div>
+            <div><strong>See</strong><span>the four-step learning loop</span></div>
+            <div><strong>Set up</strong><span>a clean Python environment</span></div>
+            <div><strong>Check</strong><span>that the Mac is ready</span></div>
           </div>
         </header>
 
         <section class="lesson-section" id="mental-model">
-          <h2>The whole course in one sentence</h2>
-          <p>Tokens go in, logits come out, loss measures the wrongness, gradients point downhill, and the optimizer changes the weights. Everything else makes that loop useful, stable, or efficient.</p>
+          <h2>1. The learning loop</h2>
+          <p>The model repeats four steps. The technical words come second.</p>
           <div class="code-reading-map">
-            <article class="code-note"><h3>Token</h3><p>A small text unit represented by an integer. It may be a word, part of a word, punctuation, or a byte sequence.</p></article>
-            <article class="code-note"><h3>Tensor</h3><p>A typed, multidimensional array. Batches, token IDs, weights, logits, and gradients are all tensors.</p></article>
-            <article class="code-note"><h3>Parameter / weight</h3><p>A learned number inside the model. Training changes parameters; generation reads them.</p></article>
-            <article class="code-note"><h3>Logit</h3><p>An unnormalized score for one possible next token. Higher means the model currently prefers it.</p></article>
-            <article class="code-note"><h3>Loss</h3><p>One number summarizing prediction error. Lower is better on the same data and tokenizer.</p></article>
-            <article class="code-note"><h3>Gradient</h3><p>The direction and sensitivity of loss for every weight. Backpropagation calculates it.</p></article>
-            <article class="code-note"><h3>Optimizer</h3><p>The update rule that turns gradients into small weight changes. This course uses AdamW.</p></article>
-            <article class="code-note"><h3>Checkpoint</h3><p>Saved weights plus configuration and tokenizer—the complete state needed to run the model.</p></article>
+            <article class="code-note"><h3>1 · Split</h3><p>Break text into small pieces called <strong>tokens</strong>.</p></article>
+            <article class="code-note"><h3>2 · Guess</h3><p>Give tokens to the model. It scores each possible next token.</p></article>
+            <article class="code-note"><h3>3 · Check</h3><p>Compare the guess with the real next token. The error score is <strong>loss</strong>.</p></article>
+            <article class="code-note"><h3>4 · Adjust</h3><p>Change the model’s stored numbers, called <strong>weights</strong>, to reduce that error.</p></article>
           </div>
-          <div class="concept-callout"><span class="term">Important</span><p><strong>Pretraining, fine-tuning, and generation use the same model.</strong> Pretraining learns broad patterns from lots of text. Fine-tuning continues learning on a small, shaped dataset. Generation freezes the weights and repeatedly chooses a next token.</p></div>
+          <div class="concept-callout"><span class="term">Three modes</span><p><strong>Pretraining</strong> learns from much text. <strong>Fine-tuning</strong> teaches a narrower behavior. <strong>Generation</strong> uses the learned weights without changing them.</p></div>
         </section>
 
         <section class="lesson-section" id="setup">
-          <h2>Set up once</h2>
-          <p>A virtual environment keeps this course’s packages separate from the rest of the Mac. Editable install makes the <code>macllm</code> command point at the Python under <code>src/</code>, so code changes take effect immediately.</p>
+          <h2>2. Set up once</h2>
+          <p>A virtual environment keeps this project’s Python packages separate. The install adds the local <code>macllm</code> command.</p>
           <article class="practice-card">
             <div class="practice-copy"><p class="practice-label">Run · repository root</p><h3>Create and verify the environment</h3><p>Run one line at a time. The downloads are Python packages; training data is downloaded later.</p></div>
             <div class="command-block"><code>python3 -m venv .venv<br />source .venv/bin/activate<br />python -m pip install --upgrade pip<br />python -m pip install -e '.[dev]'<br />macllm doctor</code><button type="button" data-copy="python3 -m venv .venv&#10;source .venv/bin/activate&#10;python -m pip install --upgrade pip&#10;python -m pip install -e '.[dev]'&#10;macllm doctor">Copy all</button></div>
             <div class="practice-expect"><strong>Expected:</strong> checkmarks for macOS, Apple silicon, Python, MLX packages, and at least 16 GB unified memory.</div>
           </article>
+          <div class="concept-callout"><span class="term">The tools</span><p><a href="../index.html#toolkit">See what macllm, MLX, MLX-LM, Tokenizers, Datasets, the Hub, and NumPy each do.</a></p></div>
           <div class="concept-callout"><span class="term">Local</span><p>Model computation remains on this Mac. Dataset and open-model commands download files from Hugging Face, but the course commands do not upload your prompts or examples.</p></div>
         </section>
 
         <section class="lesson-section" id="doctor-code">
-          <h2>Read the first Python</h2>
+          <h2>3. Read the first Python</h2>
           <p><code>macllm doctor</code> calls one small function. Read the notes, click a line range, then inspect those exact lines in the complete source.</p>
           <div class="code-reading-map">
             <article class="code-note"><button data-focus-source="doctor-source" data-lines="9-15">Lines 9–15</button><h3>Check the platform</h3><p>A list records each check as a name, pass/fail Boolean, and human-readable detail.</p></article>
@@ -89,7 +88,7 @@
 
         <aside class="checkpoint-card"><h2>Checkpoint · the command is connected</h2><p>This prints every available action. You should recognize the chapter names even if their implementation is still unfamiliar.</p><div class="command-block"><code>macllm --help</code><button type="button" data-copy="macllm --help">Copy</button></div></aside>
 
-        <nav class="chapter-pager" aria-label="Previous and next chapter"><a href="../index.html#vocabulary"><span>Back</span><strong>Vocabulary overview</strong></a><a href="01-data.html"><span>Next · Chapter 01</span><strong>Turn text into tokens →</strong></a></nav>
+        <nav class="chapter-pager" aria-label="Previous and next chapter"><a href="../index.html#vocabulary"><span>Back</span><strong>Start with one idea</strong></a><a href="01-data.html"><span>Next · Chapter 01</span><strong>Turn text into tokens →</strong></a></nav>
       </main>
     </div>
   </body>

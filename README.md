@@ -1,51 +1,57 @@
 # Mac LLM Lab
 
-Build, fine-tune, and shrink language models on one Apple-silicon Mac. The code is small enough to read, the commands are real, and every stage leaves something you can inspect.
+Build a small language model on an Apple-silicon Mac. No machine-learning background is needed.
+
+## The one idea
+
+A language model guesses the next piece of text.
+
+1. Split text into small pieces called **tokens**.
+2. Let the model guess the next token.
+3. Measure the error. That score is **loss**.
+4. Adjust the model’s stored numbers, called **weights**.
+5. Repeat.
+
+This project turns that loop into readable Python and real commands.
 
 ## Open the visual course
 
-The interactive course is plain HTML, CSS, and JavaScript: no framework, package install, or build step. Serve it from the repository root so each chapter can display the exact current Python source beside its explanation.
+The site uses plain HTML, CSS, and JavaScript. It has no build step or web framework.
 
 ```bash
 python3 -m http.server 8000
 open http://localhost:8000/site/
 ```
 
-Start with the vocabulary introduction, then follow the chapter sequence. Pretraining is split into data, transformer, and optimization chapters; fine-tuning, quantization, generation, and the complete command map each have their own page. The implementation stays deliberately small: the complete modern model is about 100 lines in [`src/macllm/model.py`](src/macllm/model.py), and every Python file under `src/macllm/` and `tests/` appears in the course with reading notes.
+Or use the [published course](https://alex-alecu.github.io/llm-tutorial/).
 
-This course is tuned for the **M5 Pro with 48 GB unified memory** in this repository's development machine. It uses [Apple MLX](https://ml-explore.github.io/mlx/) because MLX runs directly on Apple silicon and lets the CPU and GPU share memory without copies.
+Follow the chapters in order:
 
-> **Honest goal:** the from-scratch model becomes a good small story model, not a general assistant. A laptop cannot reproduce frontier pretraining. The default `standard` run is the strongest useful learning project here: about **57M parameters** and **82M training tokens** in a few hours. Exact time depends on thermals and MLX versions, so the first report gives your measured tokens/second.
+| Step | You do | You get |
+|---:|---|---|
+| 00 | Set up Python | A checked local environment |
+| 01 | Prepare stories | Tokenizer and token files |
+| 02 | Build the transformer | A model with random weights |
+| 03 | Pretrain | A model that learned story patterns |
+| 04 | Fine-tune | A narrower behavior |
+| 05 | Quantize | A smaller checkpoint |
+| 06 | Generate | New text from a prompt |
+| 07 | Trace the code | Every command mapped to Python |
 
-## The whole course on one screen
+## What each tool does
 
-```mermaid
-flowchart LR
-    A["2.1M TinyStories"] --> B["Train an 8K tokenizer"]
-    B --> C["Pretrain our 57M model"]
-    C --> D["Generate and inspect loss"]
-    D --> E["Full fine-tune our model"]
-    F["Qwen3 4B from Hugging Face"] --> G["QLoRA fine-tune"]
-    E --> H["4-bit MLX quantization"]
-    F --> I["4-bit MLX conversion"]
-    G --> J["A useful local assistant"]
-    H --> K["A smaller model we built"]
-    I --> L["A smaller open model"]
-```
+- **`macllm`** is this repository’s Python package and command. It connects every stage.
+- [**MLX**](https://ml-explore.github.io/mlx/) runs arrays and neural-network math on Apple silicon.
+- [**MLX-LM**](https://github.com/ml-explore/mlx-lm) runs, fine-tunes, and converts larger MLX language models.
+- [**Tokenizers**](https://huggingface.co/docs/tokenizers/) builds a vocabulary and converts text to token IDs.
+- [**Datasets**](https://huggingface.co/docs/datasets/) streams TinyStories without loading it all at once.
+- [**Hugging Face Hub**](https://huggingface.co/docs/huggingface_hub/) downloads public model and dataset files.
+- [**NumPy**](https://numpy.org/doc/stable/) stores long token-ID arrays efficiently.
+- **pytest** tests behavior. **Ruff** checks Python code. Both are developer-only tools.
 
-## Choose the size of the experiment
+`macllm` is the part you will read and change. The other libraries handle fast, well-tested building blocks.
 
-| Preset | Model | Tokens seen | Purpose | Rough M5 Pro time* |
-|---|---:|---:|---|---:|
-| `quick` | ~8M params | 6M | Prove the whole pipeline | 10–30 min |
-| `standard` | ~57M params | 82M | Recommended balance | 3–8 h |
-| `overnight` | ~113M params | 205M | Better output, slower iteration | 12–30 h |
-
-\*Planning ranges, not benchmarks. After the first evaluation, estimate your run with `remaining tokens ÷ reported tok/s`. Closing the lid pauses useful work; keep the Mac powered and awake.
-
-The model is intentionally modern rather than a copy of GPT-2: causal grouped-query attention, rotary positions, RMS normalization, SwiGLU feed-forwards, and tied input/output embeddings. Read [the architecture picture](docs/concepts.md) before the code in [`src/macllm/model.py`](src/macllm/model.py).
-
-## 0 · Set up once
+## Set up once
 
 Python 3.11–3.13 is supported.
 
@@ -57,51 +63,49 @@ python -m pip install -e '.[dev]'
 macllm doctor
 ```
 
-All model computation stays on this Mac. Dataset and model downloads come from Hugging Face; no prompts or training examples are uploaded by these commands.
+The editable install makes `macllm` use the code under `src/macllm/`.
 
-## 1 · Pretrain our model
+## Your first complete model
 
-Start with the quick run even if you intend to use `standard`.
+Start with the `quick` preset. It proves the whole path with about 8 million weights.
 
 ```bash
 macllm prepare --preset quick
 macllm inspect --data data/prepared/quick --text "Once upon a little time"
 macllm train --preset quick
-macllm generate --checkpoint runs/quick --prompt "Once upon a time" --max-new-tokens 160
+macllm generate --checkpoint runs/quick --prompt "Once upon a time"
+```
+
+Training creates `runs/quick/`. That checkpoint contains weights, model settings, and the tokenizer.
+
+Build a local loss report:
+
+```bash
 macllm dashboard --run runs/quick
 open runs/quick/dashboard.html
 ```
 
-What just happened:
-
-```mermaid
-flowchart TD
-    T["text: Once upon a time"] --> V["subword token IDs"]
-    V --> W["random 256-token windows"]
-    W --> P["predict every next token"]
-    P --> X["cross-entropy loss"]
-    X --> B["backpropagation"]
-    B --> U["AdamW changes 8M weights"]
-    U --> P
-```
-
-When that works, make the recommended model:
+When `quick` works, use the recommended 57M model:
 
 ```bash
 macllm prepare --preset standard
 macllm train --preset standard
-macllm generate --checkpoint runs/standard --prompt "Once upon a time" --max-new-tokens 240
-macllm dashboard --run runs/standard
-open runs/standard/dashboard.html
+macllm generate --checkpoint runs/standard --prompt "Once upon a time"
 ```
 
-Checkpoints are written at every evaluation and on `Ctrl-C`, so an intentional stop does not lose the latest weights. Continue with the visual walkthrough in [Part 1: pretraining](docs/01-pretrain.md).
+Times are planning ranges, not benchmarks:
 
-## 2 · Fine-tune two models
+| Preset | Weights | Tokens seen | Rough M5 Pro time |
+|---|---:|---:|---:|
+| `quick` | 8M | 6M | 10–30 min |
+| `standard` | 57M | 82M | 3–8 h |
+| `overnight` | 113M | 205M | 12–30 h |
 
-### 2A · Our model: full fine-tuning
+Your first training report shows measured tokens per second.
 
-Our model is small enough to update every weight. The included examples teach a compact story style; replace them with your own `prompt`/`completion` JSONL when ready.
+## Fine-tune
+
+Fine-tuning keeps training a saved model on a smaller, focused dataset.
 
 ```bash
 macllm finetune \
@@ -109,92 +113,43 @@ macllm finetune \
   --data data/our-model/train.jsonl \
   --output runs/standard-story-tuned \
   --steps 300
-
-macllm generate \
-  --checkpoint runs/standard-story-tuned \
-  --prompt $'Write a tiny story about a patient robot.\nStory:' \
-  --max-new-tokens 180
 ```
 
-### 2B · Hugging Face model: QLoRA
+The course also shows QLoRA: small adapter weights teach the 4-bit Qwen3-4B model while its main weights stay frozen. See [Chapter 04](site/chapters/04-finetune.html).
 
-[Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B) is a capable Apache-2.0 text model. We fine-tune the [MLX Community 4-bit conversion](https://huggingface.co/mlx-community/Qwen3-4B-4bit), so only small LoRA adapter matrices learn. The first command downloads about 2.3 GB.
+## Quantize
 
-```bash
-mlx_lm.lora \
-  --model mlx-community/Qwen3-4B-4bit \
-  --train \
-  --data data/qwen \
-  --mask-prompt \
-  --iters 300 \
-  --batch-size 1 \
-  --num-layers 8 \
-  --max-seq-length 1024 \
-  --grad-checkpoint \
-  --adapter-path runs/qwen3-4b-adapter
-
-mlx_lm.chat \
-  --model mlx-community/Qwen3-4B-4bit \
-  --adapter-path runs/qwen3-4b-adapter
-```
-
-Read [Part 2: fine-tuning](docs/02-finetune.md) for the masking picture, the LoRA intuition, data format, and before/after test.
-
-## 3 · Quantize weights
-
-Quantization stores groups of weights with small integers plus a scale. It reduces model size; it does **not** make training better, and 4-bit output may differ slightly.
-
-### Our model
+Quantization stores weights with fewer bits. It reduces size but can change output slightly.
 
 ```bash
 macllm quantize \
   --checkpoint runs/standard-story-tuned \
   --output runs/standard-story-tuned-4bit \
   --bits 4
-
-macllm generate \
-  --checkpoint runs/standard-story-tuned-4bit \
-  --prompt $'Write a tiny story about a patient robot.\nStory:' \
-  --temperature 0
 ```
 
-### A Hugging Face model, from original weights
-
-This deliberately starts from the official 8 GB Qwen weights so you perform the conversion yourself. Expect roughly 11 GB of disk use while both the Hugging Face cache and 4-bit output exist.
-
-```bash
-mlx_lm.convert \
-  --model Qwen/Qwen3-4B \
-  --mlx-path runs/qwen3-4b-4bit \
-  --quantize \
-  --q-bits 4 \
-  --q-group-size 64
-
-mlx_lm.chat --model runs/qwen3-4b-4bit
-```
-
-See [Part 3: quantization](docs/03-quantize.md) for a fair comparison protocol and the important difference between MLX 4-bit and GGUF formats.
+Compare original and 4-bit models with the same prompt and `--temperature 0`.
 
 ## Repository map
 
 ```text
-data/                    tiny teaching fine-tune datasets
-docs/                    the three-part visual tutorial
-site/                    interactive course; no build step
-src/macllm/model.py      readable Llama-style model
-src/macllm/data.py       streaming data + BPE tokenizer
-src/macllm/training.py   pretraining loop + metrics
-src/macllm/finetune.py   full fine-tuning with prompt masking
-src/macllm/quantization.py 4-bit conversion for our model
-tests/                   fast correctness checks
+data/                     small fine-tuning examples
+docs/                     written deep dives
+site/                     interactive course
+src/macllm/               local package and CLI
+tests/                    fast behavior checks
 ```
 
-## Guardrails
+## Honest limits
 
-- Keep at least 15 GB of disk free for `standard`; Qwen conversion needs more.
-- Run one memory-heavy ML task at a time. Unified memory is shared with macOS.
-- Training output is under ignored `runs/`; prepared tokens are under ignored `data/prepared/`.
-- TinyStories is synthetic, English, and narrow. Its dataset card lists the CDLA-Sharing-1.0 license. Do not mistake low story loss for broad language ability.
-- Read model and dataset cards before redistributing derived weights.
+- The from-scratch model learns simple TinyStories patterns. It is not a general assistant.
+- All model math stays on this Mac. Dataset and model commands download files from Hugging Face.
+- Keep at least 15 GB free for `standard`. Qwen conversion needs more.
+- Closing the lid pauses useful training. Keep the Mac powered and awake.
+- Compare models with fixed prompts, seeds, and settings. One nice sample is not proof.
 
-If something fails, use [troubleshooting](docs/troubleshooting.md), then run `macllm doctor` and include its output with the error.
+If a command fails, read [troubleshooting](docs/troubleshooting.md), then run:
+
+```bash
+macllm doctor
+```

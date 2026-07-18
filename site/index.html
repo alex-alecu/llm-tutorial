@@ -9,7 +9,9 @@
     />
     <meta name="theme-color" content="#0b0e17" />
     <title>Mac LLM Lab — learn by building</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="highlight.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -21,10 +23,10 @@
         <span>Mac LLM Lab</span>
       </a>
       <nav aria-label="Course navigation">
-        <a href="#vocabulary">Vocabulary</a>
-        <a href="chapters/01-data.html">Pretrain</a>
-        <a href="chapters/04-finetune.html">Fine-tune</a>
-        <a href="chapters/06-generate.html">Run it</a>
+        <a href="#vocabulary">Start</a>
+        <a href="#path">Course</a>
+        <a href="#toolkit">Tools</a>
+        <a href="#run-it">Run it</a>
       </nav>
       <div class="header-actions">
         <a class="github-link" href="https://github.com/alex-alecu/llm-tutorial" target="_blank" rel="noreferrer" aria-label="View project on GitHub">
@@ -45,12 +47,12 @@
           <div class="hero-copy">
             <h1>Don’t just <em>use</em> an LLM.<br />Watch one learn.</h1>
             <p class="hero-lede">
-              Build a modern 57M-parameter language model from random weights, teach it a new
-              behavior, then compress it to 4-bit — entirely on one Mac.
+              Start with no AI background. Build a small language model, watch it learn, then run
+              it on one Mac.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="#vocabulary">Learn the language first</a>
-              <a class="button button-quiet" href="#map">See the learning map <span>↓</span></a>
+              <a class="button button-primary" href="#vocabulary">Start with one idea</a>
+              <a class="button button-quiet" href="#path">See every step <span>↓</span></a>
             </div>
           </div>
 
@@ -79,94 +81,94 @@
         </div>
 
         <div class="fact-strip" aria-label="Course facts">
-          <div><strong>3</strong><span>hands-on acts</span></div>
+          <div><strong>8</strong><span>chapters in order</span></div>
           <div><strong>100%</strong><span>local computation</span></div>
           <div><strong>MLX</strong><span>native Apple silicon</span></div>
           <div><strong>0 → 1</strong><span>random weights to stories</span></div>
         </div>
       </section>
 
-      <section class="vocabulary-section section-shell" id="vocabulary" aria-labelledby="vocabulary-title">
+      <section class="vocabulary-section section-shell reveal" id="vocabulary" aria-labelledby="vocabulary-title">
         <div class="section-heading split-heading">
           <div>
-            <p class="section-kicker">Before the terminal</p>
-            <h2 id="vocabulary-title">The small vocabulary behind every LLM.</h2>
+            <p class="section-kicker">First, one idea</p>
+            <h2 id="vocabulary-title">An LLM guesses what comes next.</h2>
           </div>
           <p>
-            You do not need machine-learning experience. Learn these objects once, then watch them
-            reappear in the data, model, training, fine-tuning, quantization, and generation code.
+            Give it text. It guesses the next piece. During training, each wrong guess changes
+            millions of stored numbers a little.
           </p>
         </div>
 
-        <dl class="vocabulary-grid">
-          <div class="vocabulary-card"><dt>Token</dt><dd>A reusable piece of text represented by an integer—not necessarily a complete word.</dd></div>
-          <div class="vocabulary-card"><dt>Vocabulary</dt><dd>The fixed table of token pieces the tokenizer can encode and decode.</dd></div>
-          <div class="vocabulary-card"><dt>Tensor</dt><dd>A multidimensional array holding token IDs, vectors, scores, weights, or gradients.</dd></div>
-          <div class="vocabulary-card"><dt>Parameter</dt><dd>One learned number inside the model. A 57M model has roughly 57 million of them.</dd></div>
-          <div class="vocabulary-card"><dt>Context</dt><dd>The tokens currently visible to a prediction; this course uses 256- or 512-token windows.</dd></div>
-          <div class="vocabulary-card"><dt>Logit</dt><dd>An unnormalized score for one possible next token. Larger means more preferred.</dd></div>
-          <div class="vocabulary-card"><dt>Loss</dt><dd>A single error score. Training tries to lower it; validation checks whether learning transfers.</dd></div>
-          <div class="vocabulary-card"><dt>Gradient</dt><dd>The direction each parameter should move to reduce the current loss.</dd></div>
-          <div class="vocabulary-card"><dt>Optimizer</dt><dd>The rule that converts gradients into careful weight updates; here it is AdamW.</dd></div>
-          <div class="vocabulary-card"><dt>Checkpoint</dt><dd>Saved weights, model configuration, and tokenizer: everything needed to run again.</dd></div>
-          <div class="vocabulary-card"><dt>Fine-tuning</dt><dd>Continuing next-token training on a small dataset shaped around a desired behavior.</dd></div>
-          <div class="vocabulary-card"><dt>Inference</dt><dd>Using frozen weights to predict or generate, without backpropagation or updates.</dd></div>
-        </dl>
+        <div class="learning-loop" aria-label="Text moving through a language model">
+          <div class="loop-node"><span>1</span><strong>Text</strong><small>“A tiny robot”</small></div>
+          <i class="flow-line" aria-hidden="true"><b></b></i>
+          <div class="loop-node"><span>2</span><strong>Pieces</strong><small>tokens: 41, 92, 8</small></div>
+          <i class="flow-line" aria-hidden="true"><b></b></i>
+          <div class="loop-node neuron-node"><span>3</span><strong>Model</strong><small>weights shape the guess</small><em aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></em></div>
+          <i class="flow-line" aria-hidden="true"><b></b></i>
+          <div class="loop-node"><span>4</span><strong>Next piece</strong><small>“learned”</small></div>
+        </div>
+
+        <div class="plain-terms">
+          <article><strong>Token</strong><p>A small piece of text stored as a number.</p></article>
+          <article><strong>Weight</strong><p>One learned number. Together, weights store patterns.</p></article>
+          <article><strong>Training</strong><p>Make a guess, score it, then adjust the weights.</p></article>
+        </div>
+
+        <details class="glossary">
+          <summary>Meet the technical words when you are ready</summary>
+          <dl class="vocabulary-grid">
+            <div class="vocabulary-card"><dt>Tensor</dt><dd>A grid of numbers used by the model.</dd></div>
+            <div class="vocabulary-card"><dt>Parameter</dt><dd>The technical name for a learned weight.</dd></div>
+            <div class="vocabulary-card"><dt>Logit</dt><dd>A score for one possible next token.</dd></div>
+            <div class="vocabulary-card"><dt>Loss</dt><dd>One number that says how wrong a prediction was.</dd></div>
+            <div class="vocabulary-card"><dt>Gradient</dt><dd>A hint for how each weight should change.</dd></div>
+            <div class="vocabulary-card"><dt>Optimizer</dt><dd>The rule that applies those changes.</dd></div>
+            <div class="vocabulary-card"><dt>Checkpoint</dt><dd>A saved model you can run later.</dd></div>
+            <div class="vocabulary-card"><dt>Inference</dt><dd>Using the model without changing its weights.</dd></div>
+          </dl>
+        </details>
 
         <div class="course-start">
-          <p><strong>The loop to remember:</strong> tokens go in → logits come out → loss measures error → gradients point downhill → the optimizer changes weights.</p>
-          <a class="button button-primary" href="chapters/00-start.html">Start chapter 00 <span>→</span></a>
+          <p><strong>That is enough to begin.</strong> Each chapter introduces new terms only when you need them.</p>
+          <a class="button button-primary" href="chapters/00-start.html">Set up the project <span>→</span></a>
         </div>
       </section>
 
-      <section class="map section-shell" id="map">
+      <section class="path-section section-shell reveal" id="path">
         <div class="section-heading narrow-heading">
-          <p class="section-kicker">The learning map</p>
-          <h2>Three acts. One model you understand.</h2>
-          <p>
-            Each act produces a real artifact you can run, inspect, and compare. Follow the bright
-            line from raw text to a small local model.
-          </p>
+          <p class="section-kicker">The course, in order</p>
+          <h2>One step prepares the next.</h2>
+          <p>Follow the numbers. Every chapter ends with something that the next chapter uses.</p>
         </div>
+        <ol class="chapter-path">
+          <li><a href="chapters/00-start.html"><span>00</span><strong>Set up</strong><small>Install and check the Mac.</small></a></li>
+          <li><a href="chapters/01-data.html"><span>01</span><strong>Prepare text</strong><small>Turn stories into token IDs.</small></a></li>
+          <li><a href="chapters/02-model.html"><span>02</span><strong>Build the model</strong><small>Connect attention and math layers.</small></a></li>
+          <li><a href="chapters/03-training.html"><span>03</span><strong>Train</strong><small>Improve guesses and save weights.</small></a></li>
+          <li><a href="chapters/04-finetune.html"><span>04</span><strong>Fine-tune</strong><small>Teach a narrower behavior.</small></a></li>
+          <li><a href="chapters/05-quantize.html"><span>05</span><strong>Compress</strong><small>Store weights with fewer bits.</small></a></li>
+          <li><a href="chapters/06-generate.html"><span>06</span><strong>Generate</strong><small>Predict tokens in a loop.</small></a></li>
+          <li><a href="chapters/07-code-map.html"><span>07</span><strong>Trace the code</strong><small>Connect commands to Python.</small></a></li>
+        </ol>
+      </section>
 
-        <div class="course-map" aria-label="Three-part course roadmap">
-          <article class="map-act act-pretrain">
-            <div class="act-number">01</div>
-            <div class="act-art" aria-hidden="true">
-              <span class="raw-page">text</span>
-              <span class="map-arrow">→</span>
-              <span class="weight-cloud"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-            </div>
-            <p class="act-tag">Build intelligence</p>
-            <h3>Pretrain</h3>
-            <p>Stream stories, train a tokenizer, and turn random numbers into next-token skill.</p>
-            <a href="chapters/01-data.html">Open pretraining chapters <span>↘</span></a>
-          </article>
-
-          <article class="map-act act-finetune">
-            <div class="act-number">02</div>
-            <div class="act-art adapter-art" aria-hidden="true">
-              <span class="frozen-block">W</span>
-              <span class="plus-sign">+</span>
-              <span class="adapter-block">A·B</span>
-            </div>
-            <p class="act-tag">Shape behavior</p>
-            <h3>Fine-tune</h3>
-            <p>Update every weight in your small model, then teach Qwen3-4B with tiny adapters.</p>
-            <a href="chapters/04-finetune.html">Open fine-tuning chapter <span>↘</span></a>
-          </article>
-
-          <article class="map-act act-quantize">
-            <div class="act-number">03</div>
-            <div class="act-art bit-art" aria-hidden="true">
-              <span>32</span><i></i><i></i><i></i><span>4</span>
-            </div>
-            <p class="act-tag">Shrink the weights</p>
-            <h3>Quantize</h3>
-            <p>Trade a little numerical precision for a much smaller, easier-to-run checkpoint.</p>
-            <a href="chapters/05-quantize.html">Open quantization chapter <span>↘</span></a>
-          </article>
+      <section class="toolkit-section section-shell reveal" id="toolkit" aria-labelledby="toolkit-title">
+        <div class="section-heading split-heading">
+          <div><p class="section-kicker">What the project uses</p><h2 id="toolkit-title">A small toolkit. One job each.</h2></div>
+          <p><code>macllm</code> connects these libraries. You run one command; each library handles its part.</p>
         </div>
+        <div class="toolkit-grid">
+          <article class="tool-card tool-local"><span>Our code</span><h3>macllm</h3><p>The local Python package and command. It prepares data, trains, saves, tunes, compresses, and generates.</p><a href="chapters/07-code-map.html">See every command →</a></article>
+          <article class="tool-card"><span>Compute</span><h3>MLX</h3><p>Apple’s array and neural-network library. It runs model math on Apple silicon.</p><a href="https://ml-explore.github.io/mlx/" target="_blank" rel="noreferrer">MLX docs ↗</a></article>
+          <article class="tool-card"><span>Ready models</span><h3>MLX-LM</h3><p>Tools for running, tuning, and converting larger language models with MLX.</p><a href="https://github.com/ml-explore/mlx-lm" target="_blank" rel="noreferrer">MLX-LM docs ↗</a></article>
+          <article class="tool-card"><span>Text pieces</span><h3>Tokenizers</h3><p>Builds the vocabulary and changes text into token IDs and back.</p><a href="https://huggingface.co/docs/tokenizers/" target="_blank" rel="noreferrer">Tokenizers docs ↗</a></article>
+          <article class="tool-card"><span>Data</span><h3>Datasets</h3><p>Streams TinyStories without first loading the full dataset into memory.</p><a href="https://huggingface.co/docs/datasets/" target="_blank" rel="noreferrer">Datasets docs ↗</a></article>
+          <article class="tool-card"><span>Downloads</span><h3>Hugging Face Hub</h3><p>Downloads public model and dataset files and keeps a local cache.</p><a href="https://huggingface.co/docs/huggingface_hub/" target="_blank" rel="noreferrer">Hub docs ↗</a></article>
+          <article class="tool-card"><span>Files</span><h3>NumPy</h3><p>Reads and writes long token-ID arrays efficiently.</p><a href="https://numpy.org/doc/stable/" target="_blank" rel="noreferrer">NumPy docs ↗</a></article>
+        </div>
+        <p class="tool-footnote"><strong>Developer tools:</strong> pytest checks behavior; Ruff checks Python style. Both install with <code>.[dev]</code>.</p>
       </section>
 
       <section class="preset-section section-shell" aria-labelledby="preset-title">
@@ -513,10 +515,10 @@
         <a href="https://github.com/alex-alecu/llm-tutorial" target="_blank" rel="noreferrer">GitHub repository ↗</a>
         <a href="chapters/00-start.html">Code course</a>
         <a href="chapters/07-code-map.html">Python map</a>
-        <a href="../README.md">Written tutorial</a>
-        <a href="../docs/concepts.md">Concepts</a>
-        <a href="../src/macllm/model.py">Model source</a>
-        <a href="../docs/troubleshooting.md">Troubleshooting</a>
+        <a href="https://github.com/alex-alecu/llm-tutorial#readme">Written tutorial ↗</a>
+        <a href="https://github.com/alex-alecu/llm-tutorial/blob/main/docs/concepts.md">Concepts ↗</a>
+        <a href="https://github.com/alex-alecu/llm-tutorial/blob/main/src/macllm/model.py">Model source ↗</a>
+        <a href="https://github.com/alex-alecu/llm-tutorial/blob/main/docs/troubleshooting.md">Troubleshooting ↗</a>
       </nav>
     </footer>
   </body>

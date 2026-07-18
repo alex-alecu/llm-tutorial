@@ -304,6 +304,27 @@ $$('[data-bits]').forEach((button) => {
 });
 renderQuantization(4);
 
+// Reveal dense sections only when they approach the viewport.
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    });
+  },
+  { rootMargin: "100px 0px" },
+);
+
+$$('.reveal, .lab, .act-heading, .run-steps > li').forEach((element) => {
+  element.classList.add("reveal-ready");
+  revealObserver.observe(element);
+});
+
+if (location.hash) {
+  requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
+}
+
 // Copyable commands
 $$('[data-copy]').forEach((button) => {
   button.addEventListener("click", async () => {

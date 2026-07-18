@@ -52,17 +52,21 @@ function renderSource(code, source) {
     const row = document.createElement("span");
     row.className = "source-line";
     row.dataset.line = String(index + 1);
-    row.textContent = line || " ";
+    window.macllmHighlight.appendHighlighted(row, line || " ", "python");
     code.append(row);
   });
 }
 
 const sourceLoads = new Map();
 
-document.querySelectorAll("[data-python-source]").forEach((viewer) => {
-  const sourcePath = viewer.dataset.pythonSource;
+function loadSource(viewer) {
+  if (sourceLoads.has(viewer.id)) return sourceLoads.get(viewer.id);
+  const sourcePath = location.pathname.includes("/site/")
+    ? viewer.dataset.pythonSource
+    : viewer.dataset.pythonSource.replace(/^\.\.\/\.\.\//, "../");
   const code = viewer.querySelector("code");
   const status = viewer.querySelector("[data-source-status]");
+  viewer.querySelector(".source-meta a").href = sourcePath;
   const load = fetch(sourcePath)
     .then((response) => {
       if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -80,11 +84,25 @@ document.querySelectorAll("[data-python-source]").forEach((viewer) => {
       return viewer;
     });
   sourceLoads.set(viewer.id, load);
+  return load;
+}
+
+document.querySelectorAll("[data-python-source]").forEach((viewer) => {
+  const status = viewer.querySelector("[data-source-status]");
+  status.textContent = "Source loads when opened";
+  viewer.addEventListener("toggle", () => {
+    if (viewer.open) loadSource(viewer);
+  });
+  if (viewer.open) {
+    const schedule = window.requestIdleCallback ?? ((task) => window.setTimeout(task, 250));
+    schedule(() => loadSource(viewer));
+  }
 });
 
 document.querySelectorAll("[data-focus-source]").forEach((button) => {
   button.addEventListener("click", async () => {
-    const viewer = await sourceLoads.get(button.dataset.focusSource);
+    const target = document.querySelector(`#${button.dataset.focusSource}`);
+    const viewer = target ? await loadSource(target) : null;
     if (!viewer || viewer.classList.contains("source-load-failed")) return;
     const [start, end = start] = button.dataset.lines.split("-").map(Number);
     viewer.querySelectorAll(".source-line").forEach((line) => {
@@ -105,4 +123,24 @@ if (progress) {
   };
   window.addEventListener("scroll", updateProgress, { passive: true });
   updateProgress();
+}
+
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    });
+  },
+  { rootMargin: "100px 0px" },
+);
+
+document.querySelectorAll(".lesson-section, .checkpoint-card, .chapter-pager").forEach((element) => {
+  element.classList.add("reveal-ready");
+  revealObserver.observe(element);
+});
+
+if (location.hash) {
+  requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
 }

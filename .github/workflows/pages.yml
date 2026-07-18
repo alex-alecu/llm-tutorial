@@ -25,10 +25,16 @@ jobs:
         uses: actions/checkout@v6
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Assemble the small public site
+        run: |
+          mkdir -p public
+          cp -R site/. public/
+          cp -R src tests public/
+          touch public/.nojekyll
       - name: Upload static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: public
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
