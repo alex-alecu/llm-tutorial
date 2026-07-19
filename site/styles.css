@@ -13,6 +13,16 @@
   --peach: #ffad8b;
   --blue: #79b8ff;
   --yellow: #f4d35e;
+  --code-bg: #090c13;
+  --code-text: #e9edf5;
+  --code-line: #252b38;
+  --code-meta: #9ca6b8;
+  --code-gutter: #596274;
+  --syntax-comment: #697386;
+  --syntax-string: #f6c177;
+  --syntax-keyword: #c4a7e7;
+  --syntax-number: #9ccfd8;
+  --syntax-function: #90f5c5;
   --shadow: 0 30px 80px rgb(0 0 0 / 24%);
   --radius: 24px;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -34,6 +44,16 @@
   --peach: #b64e2c;
   --blue: #1769aa;
   --yellow: #a26d00;
+  --code-bg: #fbfaf6;
+  --code-text: #242932;
+  --code-line: #d7d1c4;
+  --code-meta: #626b78;
+  --code-gutter: #8a8f99;
+  --syntax-comment: #596274;
+  --syntax-string: #8a4b08;
+  --syntax-keyword: #6c3ab2;
+  --syntax-number: #126272;
+  --syntax-function: #006b4d;
   --shadow: 0 30px 80px rgb(37 31 19 / 10%);
 }
 
@@ -1980,7 +2000,7 @@ footer nav a:hover {
   margin: 30px 0;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: #090c13;
+  background: var(--code-bg);
   box-shadow: var(--shadow);
 }
 
@@ -2002,13 +2022,13 @@ footer nav a:hover {
   justify-content: space-between;
   gap: 16px;
   padding: 10px 18px;
-  border-bottom: 1px solid #252b38;
-  color: #9ca6b8;
+  border-bottom: 1px solid var(--code-line);
+  color: var(--code-meta);
   font: 0.72rem/1.4 var(--mono);
 }
 
 .source-meta a {
-  color: #90f5c5;
+  color: var(--syntax-function);
 }
 
 .source-viewer pre {
@@ -2022,7 +2042,7 @@ footer nav a:hover {
   display: block;
   min-width: max-content;
   padding: 14px 0 28px;
-  color: #e9edf5;
+  color: var(--code-text);
   font: 0.78rem/1.62 var(--mono);
   counter-reset: source-line;
 }
@@ -2040,15 +2060,15 @@ footer nav a:hover {
   position: absolute;
   left: 0;
   width: 48px;
-  color: #596274;
+  color: var(--code-gutter);
   content: counter(source-line);
   text-align: right;
   user-select: none;
 }
 
 .source-line.is-focused {
-  background: color-mix(in srgb, #90f5c5, transparent 88%);
-  box-shadow: inset 3px 0 #90f5c5;
+  background: color-mix(in srgb, var(--syntax-function), transparent 88%);
+  box-shadow: inset 3px 0 var(--syntax-function);
 }
 
 .source-load-failed pre {
@@ -2393,28 +2413,28 @@ footer nav a:hover {
 }
 
 .syntax-comment {
-  color: #697386;
+  color: var(--syntax-comment);
   font-style: italic;
 }
 
 .syntax-string {
-  color: #f6c177;
+  color: var(--syntax-string);
 }
 
 .syntax-keyword,
 .syntax-decorator,
 .syntax-command {
-  color: #c4a7e7;
+  color: var(--syntax-keyword);
 }
 
 .syntax-number,
 .syntax-variable {
-  color: #9ccfd8;
+  color: var(--syntax-number);
 }
 
 .syntax-function,
 .syntax-option {
-  color: #90f5c5;
+  color: var(--syntax-function);
 }
 
 @media (max-width: 900px) {
