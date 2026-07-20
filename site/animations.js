@@ -27,16 +27,23 @@ function makeStepper(root, stages, render) {
   });
   next.addEventListener("click", () => {
     stop();
-    show(index + 1);
+    show(index === stages.length - 1 ? 0 : index + 1);
   });
   play.addEventListener("click", () => {
     if (timer) {
       stop();
       return;
     }
+    if (index === stages.length - 1) show(0);
     play.textContent = "Pause";
     play.setAttribute("aria-pressed", "true");
-    timer = window.setInterval(() => show(index + 1), 1450);
+    timer = window.setInterval(() => {
+      if (index === stages.length - 1) {
+        stop();
+        return;
+      }
+      show(index + 1);
+    }, 2400);
   });
   show(0);
   if (reducedMotion) play.textContent = "Step automatically";
@@ -97,6 +104,17 @@ document.querySelectorAll("[data-training-demo]").forEach((root) => {
   makeStepper(root, stages, (stage, index) => {
     root.dataset.phase = stage.key;
     setStageText(root, stage, index, stages.length);
+    root.querySelectorAll("[data-flow-stage]").forEach((item) => {
+      const activeStages = stage.key === "forward"
+        ? ["embedding", "blocks"]
+        : stage.key === "backward"
+          ? ["loss", "logits", "blocks", "embedding"]
+          : stage.key === "update"
+            ? ["clip", "blocks", "embedding"]
+            : [stage.key];
+      if (activeStages.includes(item.dataset.flowStage)) item.setAttribute("aria-current", "step");
+      else item.removeAttribute("aria-current");
+    });
   });
 });
 
@@ -120,9 +138,13 @@ document.querySelectorAll("[data-inference-demo]").forEach((root) => {
     root.dataset.phase = stage.key;
     setStageText(root, stage, index, stages.length);
     const next = generated[cycle % generated.length];
-    root.querySelector("[data-next-token]").textContent = next.token;
-    root.querySelector("[data-next-id]").textContent = next.id;
+    root.querySelectorAll("[data-next-token]").forEach((item) => { item.textContent = next.token; });
+    root.querySelectorAll("[data-next-id]").forEach((item) => { item.textContent = next.id; });
     root.querySelector("[data-next-probability]").textContent = next.probability;
+    root.querySelectorAll("[data-flow-stage]").forEach((item) => {
+      if (item.dataset.flowStage === stage.key) item.setAttribute("aria-current", "step");
+      else item.removeAttribute("aria-current");
+    });
     if (stage.key === "append") {
       const tokenRow = root.querySelector("[data-token-row]");
       if (![...tokenRow.children].some((item) => item.dataset.cycle === String(cycle))) {
@@ -132,6 +154,9 @@ document.querySelectorAll("[data-inference-demo]").forEach((root) => {
         token.innerHTML = `${next.token}<small>${next.id}</small>`;
         tokenRow.append(token);
         root.querySelector("[data-cache-count]").textContent = String(tokenRow.children.length);
+        const cacheSlot = document.createElement("i");
+        cacheSlot.innerHTML = `K/V<small>${next.id}</small>`;
+        root.querySelector("[data-cache-slots]")?.append(cacheSlot);
         cycle += 1;
       }
     }

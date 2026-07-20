@@ -62,29 +62,46 @@ function parseLineRange(button) {
   return { start, end };
 }
 
-function focusSourceRange(viewer, button, { scroll = false } = {}) {
+function focusSourceRange(viewer, button, { scrollBehavior = null } = {}) {
   const { start, end } = parseLineRange(button);
-  viewer.querySelectorAll(".source-line").forEach((line) => {
+  const lines = [...viewer.querySelectorAll(".source-line")];
+  lines.forEach((line) => {
     const number = Number(line.dataset.line);
     line.classList.toggle("is-focused", number >= start && number <= end);
+    line.classList.toggle("is-range-start", number === start);
+    line.classList.toggle("is-range-end", number === end);
   });
+  viewer.classList.add("has-focused-lines");
   const map = button.closest(".code-reading-map");
   map?.querySelectorAll(".code-note").forEach((note) => {
     const active = note.contains(button);
     note.classList.toggle("is-active", active);
     note.querySelector("button")?.setAttribute("aria-pressed", String(active));
   });
-  viewer.dataset.focusedLines = start === end ? `Line ${start}` : `Lines ${start}–${end}`;
-  if (!scroll) return;
-  const first = viewer.querySelector(`.source-line[data-line="${start}"]`);
+  const rangeLabel = start === end ? `Line ${start}` : `Lines ${start}–${end}`;
+  viewer.dataset.focusedLines = rangeLabel;
+  const noteTitle = button.closest(".code-note")?.querySelector("h3")?.textContent;
+  const focusStatus = viewer.querySelector("[data-source-focus-status]");
+  if (focusStatus) focusStatus.textContent = noteTitle ? `${rangeLabel} · ${noteTitle}` : rangeLabel;
+  if (!scrollBehavior) return;
+  const first = lines[start - 1];
+  const last = lines[end - 1];
   const scroller = viewer.querySelector("pre");
-  if (first && scroller) {
-    const lineTop = (start - 1) * first.getBoundingClientRect().height;
-    scroller.scrollTop = Math.max(0, lineTop - scroller.clientHeight / 3);
-  }
+  if (!first || !last || !scroller) return;
+  requestAnimationFrame(() => {
+    const scrollerTop = scroller.getBoundingClientRect().top;
+    const rangeTop = first.getBoundingClientRect().top - scrollerTop + scroller.scrollTop;
+    const rangeBottom = last.getBoundingClientRect().bottom - scrollerTop + scroller.scrollTop;
+    const rangeHeight = rangeBottom - rangeTop;
+    const target = rangeHeight > scroller.clientHeight - 48
+      ? rangeTop - 20
+      : (rangeTop + rangeBottom) / 2 - scroller.clientHeight / 2;
+    scroller.scrollTo({ top: Math.max(0, target), behavior: scrollBehavior });
+  });
 }
 
 function buildGuidedReaders() {
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   document.querySelectorAll(".source-viewer").forEach((viewer) => {
     const map = viewer.previousElementSibling;
     if (!map?.classList.contains("code-reading-map")) return;
@@ -97,17 +114,38 @@ function buildGuidedReaders() {
     reader.append(map, viewer);
     viewer.open = true;
     map.setAttribute("aria-label", "Choose an explanation to highlight its exact code lines");
+    const focusStatus = document.createElement("span");
+    focusStatus.className = "source-focus-status";
+    focusStatus.dataset.sourceFocusStatus = "";
+    focusStatus.textContent = "Choose an explanation";
+    viewer.querySelector(".source-meta")?.prepend(focusStatus);
+    let hoverTimer = null;
+    let activationVersion = 0;
+
+    const activate = async (button, scrollBehavior) => {
+      const version = ++activationVersion;
+      window.clearTimeout(hoverTimer);
+      const loadedViewer = await loadSource(viewer);
+      if (version !== activationVersion || loadedViewer.classList.contains("source-load-failed")) {
+        return;
+      }
+      loadedViewer.open = true;
+      focusSourceRange(loadedViewer, button, { scrollBehavior });
+    };
+
     buttons.forEach((button) => {
+      const note = button.closest(".code-note");
       button.type = "button";
       button.setAttribute("aria-controls", viewer.id);
       button.setAttribute("aria-pressed", "false");
-      button.addEventListener("mouseenter", () => focusSourceRange(viewer, button));
-      button.addEventListener("focus", () => focusSourceRange(viewer, button));
-      button.addEventListener("click", async () => {
-        await loadSource(viewer);
-        viewer.open = true;
-        focusSourceRange(viewer, button, { scroll: true });
+      button.setAttribute("aria-label", `${button.textContent}: ${note?.querySelector("h3")?.textContent}`);
+      button.addEventListener("focus", () => activate(button, "smooth"));
+      note?.addEventListener("click", () => activate(button, "smooth"));
+      if (supportsHover) note?.addEventListener("pointerenter", () => {
+        window.clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => activate(button, "smooth"), 90);
       });
+      note?.addEventListener("pointerleave", () => window.clearTimeout(hoverTimer));
     });
     loadSource(viewer);
   });
@@ -164,7 +202,7 @@ document.querySelectorAll("[data-focus-source]").forEach((button) => {
     const viewer = target ? await loadSource(target) : null;
     if (!viewer || viewer.classList.contains("source-load-failed")) return;
     viewer.open = true;
-    focusSourceRange(viewer, button, { scroll: true });
+    focusSourceRange(viewer, button, { scrollBehavior: "smooth" });
   });
 });
 
