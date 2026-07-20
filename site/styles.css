@@ -1981,8 +1981,9 @@ footer nav a:hover {
   gap: 10px;
   max-height: 760px;
   margin: 0;
-  padding-right: 4px;
+  padding: 1px 12px 1px 1px;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .guided-code .code-note {
@@ -2140,6 +2141,10 @@ footer nav a:hover {
   counter-increment: source-line;
   opacity: 1;
   transition: background 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+}
+
+.source-line.has-explanation {
+  cursor: pointer;
 }
 
 .source-line::before {

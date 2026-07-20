@@ -100,6 +100,17 @@ function focusSourceRange(viewer, button, { scrollBehavior = null } = {}) {
   });
 }
 
+function revealExplanation(map, note, behavior = "smooth") {
+  if (!map || !note || map.scrollHeight <= map.clientHeight) return;
+  const mapRect = map.getBoundingClientRect();
+  const noteRect = note.getBoundingClientRect();
+  const inset = 12;
+  if (noteRect.top >= mapRect.top + inset && noteRect.bottom <= mapRect.bottom - inset) return;
+  const noteTop = noteRect.top - mapRect.top + map.scrollTop;
+  const target = noteTop - (map.clientHeight - noteRect.height) / 2;
+  map.scrollTo({ top: Math.max(0, target), behavior });
+}
+
 function buildGuidedReaders() {
   const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   document.querySelectorAll(".source-viewer").forEach((viewer) => {
@@ -121,8 +132,9 @@ function buildGuidedReaders() {
     viewer.querySelector(".source-meta")?.prepend(focusStatus);
     let hoverTimer = null;
     let activationVersion = 0;
+    let lastSourceButton = null;
 
-    const activate = async (button, scrollBehavior) => {
+    const activate = async (button, scrollBehavior, { revealNote = false } = {}) => {
       const version = ++activationVersion;
       window.clearTimeout(hoverTimer);
       const loadedViewer = await loadSource(viewer);
@@ -131,6 +143,22 @@ function buildGuidedReaders() {
       }
       loadedViewer.open = true;
       focusSourceRange(loadedViewer, button, { scrollBehavior });
+      if (revealNote) revealExplanation(map, button.closest(".code-note"));
+    };
+
+    const buttonForLine = (line) => {
+      const number = Number(line?.dataset.line);
+      if (!number) return null;
+      return buttons.find((button) => {
+        const { start, end } = parseLineRange(button);
+        return number >= start && number <= end;
+      }) || null;
+    };
+
+    const connectSourceLines = (loadedViewer) => {
+      loadedViewer.querySelectorAll(".source-line").forEach((line) => {
+        line.classList.toggle("has-explanation", Boolean(buttonForLine(line)));
+      });
     };
 
     buttons.forEach((button) => {
@@ -147,7 +175,20 @@ function buildGuidedReaders() {
       });
       note?.addEventListener("pointerleave", () => window.clearTimeout(hoverTimer));
     });
-    loadSource(viewer);
+    const sourceScroller = viewer.querySelector("pre");
+    if (supportsHover) sourceScroller?.addEventListener("pointermove", (event) => {
+      const line = event.target.closest(".source-line");
+      const button = line && sourceScroller.contains(line) ? buttonForLine(line) : null;
+      if (!button || button === lastSourceButton) return;
+      lastSourceButton = button;
+      window.clearTimeout(hoverTimer);
+      hoverTimer = window.setTimeout(() => activate(button, null, { revealNote: true }), 70);
+    });
+    sourceScroller?.addEventListener("pointerleave", () => {
+      lastSourceButton = null;
+      window.clearTimeout(hoverTimer);
+    });
+    loadSource(viewer).then(connectSourceLines);
   });
 }
 
