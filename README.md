@@ -31,8 +31,8 @@ Follow the chapters in order:
 |---:|---|---|
 | 00 | Set up Python | A checked local environment |
 | 01 | Prepare stories | Tokenizer and token files |
-| 02 | Build the transformer | A model with random weights |
-| 03 | Pretrain | A model that learned story patterns |
+| 02 | Learn neural-network basics, then build the transformer | A model with random weights |
+| 03 | Trace backpropagation, then pretrain | A model that learned story patterns |
 | 04 | Fine-tune | A narrower behavior |
 | 05 | Quantize | A smaller checkpoint |
 | 06 | Generate | New text from a prompt |
@@ -64,6 +64,10 @@ macllm doctor
 ```
 
 The editable install makes `macllm` use the code under `src/macllm/`.
+
+Chapter 02 animates a small neural network from numeric inputs to a prediction. Chapter 03 follows the transformer forward to loss, then backward through gradients and an optimizer update. Chapter 06 animates the complete inference loop, including token encoding, the KV cache, decoding, and feeding each generated token back as input.
+
+The source readers place explanation beside exact repository code. Select an explanation to highlight only the lines it describes; comments inside the core model, training, and generation files provide a second layer of detail.
 
 ## Your first complete model
 

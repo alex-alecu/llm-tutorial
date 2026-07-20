@@ -28,6 +28,7 @@ def cosine_learning_rate(step: int, config: TrainConfig) -> float:
 
 def language_model_loss(model: TinyLM, inputs: mx.array, targets: mx.array) -> mx.array:
     logits, _ = model(inputs)
+    # One scalar summarizes how surprised the model was by all correct next tokens.
     return nn.losses.cross_entropy(logits.astype(mx.float32), targets, reduction="mean")
 
 
@@ -69,13 +70,17 @@ def train(
         betas=[0.9, 0.95],
         weight_decay=config.weight_decay,
     )
+    # MLX records the forward operations, then differentiates them backward automatically.
     loss_and_grad = nn.value_and_grad(model, language_model_loss)
     state = [model.state, optimizer.state]
 
     @partial(mx.compile, inputs=state, outputs=state)
     def step(inputs, targets):
+        # Forward pass returns loss; backpropagation returns one gradient per weight.
         loss, grads = loss_and_grad(model, inputs, targets)
+        # Clipping rescales an unusually large gradient before it can destabilize learning.
         grads, grad_norm = optim.clip_grad_norm(grads, config.grad_clip)
+        # AdamW combines gradients with running statistics, then changes the weights.
         optimizer.update(model, grads)
         return loss, grad_norm
 
@@ -96,6 +101,7 @@ def train(
     try:
         for index in range(config.steps):
             optimizer.learning_rate = cosine_learning_rate(index, config)
+            # Targets are the same token windows shifted one place into the future.
             x, y = train_data.batch(rng, config.batch_size, config.model.max_seq_len)
             loss, grad_norm = step(mx.array(x), mx.array(y))
             mx.eval(state, loss, grad_norm)

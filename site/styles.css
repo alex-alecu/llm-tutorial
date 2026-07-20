@@ -1967,6 +1967,45 @@ footer nav a:hover {
   margin: 24px 0;
 }
 
+.guided-code {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.58fr) minmax(0, 1.42fr);
+  gap: 14px;
+  align-items: stretch;
+  margin: 28px 0;
+}
+
+.guided-code .code-reading-map {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 720px;
+  margin: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+}
+
+.guided-code .code-note {
+  flex: none;
+  cursor: default;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.guided-code .code-note.is-active {
+  transform: translateX(3px);
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.guided-code .code-note.is-active p {
+  color: var(--ink);
+}
+
+.guided-code .source-viewer {
+  min-width: 0;
+  margin: 0;
+}
+
 .code-note {
   padding: 18px;
   border: 1px solid var(--line);
@@ -2069,6 +2108,330 @@ footer nav a:hover {
 .source-line.is-focused {
   background: color-mix(in srgb, var(--syntax-function), transparent 88%);
   box-shadow: inset 3px 0 var(--syntax-function);
+}
+
+/* Step-through neural-network, training, and inference explainers */
+.learning-visual {
+  margin: 28px 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.learning-visual-stage {
+  padding: clamp(18px, 4vw, 34px);
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    var(--code-bg);
+  background-size: 30px 30px;
+}
+
+.learning-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--code-text);
+}
+
+.network-edge {
+  fill: none;
+  stroke: var(--code-gutter);
+  stroke-width: 2;
+  transition: stroke 220ms ease, stroke-width 220ms ease, opacity 220ms ease;
+}
+
+.network-edge.is-secondary {
+  opacity: 0.45;
+}
+
+.network-node circle {
+  fill: var(--surface-2);
+  stroke: var(--code-gutter);
+  stroke-width: 2;
+  transition: fill 220ms ease, stroke 220ms ease, transform 220ms ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.network-node text,
+.network-label,
+.weight-label {
+  fill: currentColor;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-anchor: middle;
+}
+
+.network-label,
+.weight-label {
+  fill: var(--code-meta);
+  font-size: 11px;
+}
+
+.learning-visual[data-phase="inputs"] .node-input circle,
+.learning-visual[data-phase="weighted"] .node-input circle,
+.learning-visual[data-phase="weighted"] .node-hidden circle,
+.learning-visual[data-phase="prediction"] .network-node circle,
+.learning-visual[data-phase="backward"] .network-node circle,
+.learning-visual[data-phase="update"] .network-node circle {
+  fill: var(--mint-soft);
+  stroke: var(--mint);
+}
+
+.learning-visual[data-phase="weighted"] .network-edge,
+.learning-visual[data-phase="prediction"] .network-edge,
+.learning-visual[data-phase="backward"] .network-edge,
+.learning-visual[data-phase="update"] .network-edge {
+  stroke: var(--mint);
+}
+
+.learning-visual[data-phase="prediction"] .node-output circle {
+  transform: scale(1.12);
+}
+
+.learning-visual[data-phase="backward"] .network-edge {
+  stroke: var(--peach);
+  stroke-dasharray: 7 6;
+  stroke-width: 3;
+}
+
+.learning-visual[data-phase="update"] .network-edge {
+  stroke: var(--violet);
+  stroke-width: 3;
+}
+
+.loss-target {
+  opacity: 0.35;
+  transition: opacity 180ms ease;
+}
+
+.learning-visual[data-phase="prediction"] .loss-target,
+.learning-visual[data-phase="backward"] .loss-target,
+.learning-visual[data-phase="update"] .loss-target {
+  opacity: 1;
+}
+
+.learning-visual-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  min-height: 142px;
+  padding: 22px 24px;
+  border-top: 1px solid var(--line);
+}
+
+.learning-step-label {
+  margin: 0 0 6px;
+  color: var(--mint);
+  font: 700 0.72rem/1.4 var(--mono);
+}
+
+.learning-visual-copy h3 {
+  margin: 0 0 7px;
+  font-size: 1.18rem;
+}
+
+.learning-visual-copy p:last-child {
+  max-width: 660px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.learning-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: end;
+}
+
+.learning-controls button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg-soft);
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.learning-controls [data-step-play] {
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.learning-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.transformer-flow,
+.inference-flow {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(92px, 1fr));
+  gap: 9px;
+  align-items: stretch;
+}
+
+.flow-stage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 128px;
+  padding: 14px 10px;
+  border: 1px solid var(--code-line);
+  border-radius: 13px;
+  background: var(--surface);
+  text-align: center;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, opacity 180ms ease;
+}
+
+.flow-stage::after {
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  width: 10px;
+  height: 2px;
+  background: var(--code-gutter);
+  content: "";
+}
+
+.flow-stage:last-child::after {
+  display: none;
+}
+
+.flow-stage strong,
+.flow-stage small,
+.flow-stage code {
+  display: block;
+}
+
+.flow-stage strong {
+  font-size: 0.82rem;
+}
+
+.flow-stage small {
+  margin-top: 7px;
+  color: var(--code-meta);
+  font-size: 0.68rem;
+}
+
+.flow-stage code {
+  margin-top: 8px;
+  color: var(--mint);
+  font: 0.68rem/1.35 var(--mono);
+}
+
+.flow-stage .mini-neurons {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 9px 0 2px;
+}
+
+.mini-neurons i {
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--code-gutter);
+  border-radius: 50%;
+  background: var(--surface-2);
+}
+
+.learning-visual[data-phase="batch"] [data-flow-stage="batch"],
+.learning-visual[data-phase="forward"] [data-flow-stage="embedding"],
+.learning-visual[data-phase="forward"] [data-flow-stage="blocks"],
+.learning-visual[data-phase="loss"] [data-flow-stage="logits"],
+.learning-visual[data-phase="loss"] [data-flow-stage="loss"],
+.learning-visual[data-phase="backward"] .flow-stage,
+.learning-visual[data-phase="clip"] [data-flow-stage="clip"],
+.learning-visual[data-phase="update"] [data-flow-stage="blocks"],
+.learning-visual[data-phase="update"] [data-flow-stage="embedding"] {
+  transform: translateY(-4px);
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.learning-visual[data-phase="backward"] .flow-stage {
+  border-color: var(--peach);
+}
+
+.learning-visual[data-phase="backward"] .flow-stage::after {
+  background: var(--peach);
+}
+
+.learning-visual[data-phase="forward"] .mini-neurons i,
+.learning-visual[data-phase="backward"] .mini-neurons i,
+.learning-visual[data-phase="update"] .mini-neurons i {
+  border-color: var(--mint);
+  background: var(--mint);
+}
+
+.inference-flow {
+  grid-template-columns: repeat(5, minmax(100px, 1fr));
+}
+
+.token-sequence {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.token-sequence > span {
+  display: grid;
+  padding: 8px 10px;
+  border: 1px solid var(--code-line);
+  border-radius: 9px;
+  background: var(--surface);
+  font: 0.74rem/1.2 var(--mono);
+}
+
+.token-sequence small {
+  margin-top: 3px;
+  color: var(--code-meta);
+  font-size: 0.62rem;
+}
+
+.token-sequence .generated-token {
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.cache-lane {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px dashed var(--code-gutter);
+  border-radius: 11px;
+  color: var(--code-meta);
+  font: 0.7rem/1.4 var(--mono);
+}
+
+.cache-lane strong {
+  color: var(--code-text);
+}
+
+.learning-visual[data-phase="encode"] [data-flow-stage="encode"],
+.learning-visual[data-phase="embed"] [data-flow-stage="embed"],
+.learning-visual[data-phase="transform"] [data-flow-stage="transform"],
+.learning-visual[data-phase="scores"] [data-flow-stage="scores"],
+.learning-visual[data-phase="choose"] [data-flow-stage="choose"],
+.learning-visual[data-phase="append"] .token-sequence .generated-token:last-child {
+  transform: translateY(-4px);
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.learning-visual[data-phase="transform"] .cache-lane {
+  border-color: var(--violet);
+  color: var(--code-text);
 }
 
 .source-load-failed pre {
@@ -2486,6 +2849,10 @@ footer nav a:hover {
   .toolkit-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .guided-code {
+    grid-template-columns: minmax(220px, 0.55fr) minmax(0, 1.45fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -2518,6 +2885,34 @@ footer nav a:hover {
   .chapter-path,
   .toolkit-grid {
     grid-template-columns: 1fr;
+  }
+
+  .guided-code {
+    grid-template-columns: 1fr;
+  }
+
+  .guided-code .code-reading-map {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .learning-visual-copy {
+    grid-template-columns: 1fr;
+  }
+
+  .learning-controls {
+    justify-content: start;
+  }
+
+  .transformer-flow,
+  .inference-flow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .flow-stage::after {
+    display: none;
   }
 }
 
@@ -2779,6 +3174,16 @@ footer nav a:hover {
     animation: token-in 700ms calc(var(--i) * 90ms) both;
   }
 
+  .learning-visual[data-phase="backward"] .network-edge {
+    animation: gradient-return 900ms linear infinite;
+  }
+
+  .learning-visual[data-phase="forward"] .flow-stage::after,
+  .learning-visual[data-phase="transform"] .flow-stage::after,
+  .learning-visual[data-phase="append"] .generated-token:last-child {
+    animation: learning-pulse 900ms ease-in-out infinite;
+  }
+
   @keyframes breathe {
     50% {
       box-shadow: 0 0 110px color-mix(in srgb, var(--violet), transparent 62%);
@@ -2818,5 +3223,13 @@ footer nav a:hover {
     from { transform: translateY(0); opacity: 0; }
     20% { opacity: 1; }
     to { transform: translateY(35px); opacity: 0; }
+  }
+
+  @keyframes gradient-return {
+    to { stroke-dashoffset: -26; }
+  }
+
+  @keyframes learning-pulse {
+    50% { opacity: 0.45; }
   }
 }

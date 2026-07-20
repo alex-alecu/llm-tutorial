@@ -24,13 +24,17 @@ class Attention(nn.Module):
 
     def __call__(self, x: mx.array, cache=None):
         batch, length, _ = x.shape
+        # Each projection gives every token a different role in attention:
+        # query = what I need, key = what I contain, value = what I can share.
         q = self.q_proj(x).reshape(batch, length, self.n_heads, self.head_dim)
         k = self.k_proj(x).reshape(batch, length, self.n_kv_heads, self.head_dim)
         v = self.v_proj(x).reshape(batch, length, self.n_kv_heads, self.head_dim)
+        # Attention expects heads before time: [batch, heads, tokens, head_dim].
         q = q.transpose(0, 2, 1, 3)
         k = k.transpose(0, 2, 1, 3)
         v = v.transpose(0, 2, 1, 3)
 
+        # Cached keys and values are the transformer loop's memory during generation.
         offset = 0 if cache is None else cache[0].shape[2]
         q = self.rope(q, offset=offset)
         k = self.rope(k, offset=offset)
@@ -38,7 +42,7 @@ class Attention(nn.Module):
             k = mx.concatenate((cache[0], k), axis=2)
             v = mx.concatenate((cache[1], v), axis=2)
 
-        mask = "causal" if length > 1 else None
+        mask = "causal" if length > 1 else None  # A token cannot inspect future answers.
         attended = mx.fast.scaled_dot_product_attention(
             q, k, v, scale=1.0 / math.sqrt(self.head_dim), mask=mask
         )
@@ -56,6 +60,7 @@ class FeedForward(nn.Module):
         self.down = nn.Linear(config.hidden_dim, config.dim, bias=False)
 
     def __call__(self, x: mx.array) -> mx.array:
+        # SiLU opens a learned gate; multiplication chooses which features pass through.
         return self.down(nn.silu(self.gate(x)) * self.up(x))
 
 
@@ -69,7 +74,7 @@ class TransformerBlock(nn.Module):
 
     def __call__(self, x: mx.array, cache=None):
         attended, cache = self.attention(self.attention_norm(x), cache)
-        x = x + attended
+        x = x + attended  # The residual keeps the old stream and adds new context.
         return x + self.feed_forward(self.ffn_norm(x)), cache
 
 
@@ -90,11 +95,13 @@ class TinyLM(nn.Module):
                 f"Sequence has {tokens.shape[1]} tokens; maximum is {self.config.max_seq_len}"
             )
         caches = [None] * len(self.layers) if cache is None else cache
-        x = self.embed(tokens)
+        x = self.embed(tokens)  # Integer token IDs become learned vectors.
         next_caches = []
         for layer, layer_cache in zip(self.layers, caches, strict=True):
+            # Every layer refines the same residual stream and grows its own KV cache.
             x, layer_cache = layer(x, layer_cache)
             next_caches.append(layer_cache)
+        # Weight tying reuses the embedding table to score every possible next token.
         return self.embed.as_linear(self.norm(x)), next_caches
 
 

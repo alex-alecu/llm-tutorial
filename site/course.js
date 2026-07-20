@@ -57,6 +57,62 @@ function renderSource(code, source) {
   });
 }
 
+function parseLineRange(button) {
+  const [start, end = start] = button.dataset.lines.split("-").map(Number);
+  return { start, end };
+}
+
+function focusSourceRange(viewer, button, { scroll = false } = {}) {
+  const { start, end } = parseLineRange(button);
+  viewer.querySelectorAll(".source-line").forEach((line) => {
+    const number = Number(line.dataset.line);
+    line.classList.toggle("is-focused", number >= start && number <= end);
+  });
+  const map = button.closest(".code-reading-map");
+  map?.querySelectorAll(".code-note").forEach((note) => {
+    const active = note.contains(button);
+    note.classList.toggle("is-active", active);
+    note.querySelector("button")?.setAttribute("aria-pressed", String(active));
+  });
+  viewer.dataset.focusedLines = start === end ? `Line ${start}` : `Lines ${start}–${end}`;
+  if (!scroll) return;
+  const first = viewer.querySelector(`.source-line[data-line="${start}"]`);
+  const scroller = viewer.querySelector("pre");
+  if (first && scroller) {
+    const lineTop = (start - 1) * first.getBoundingClientRect().height;
+    scroller.scrollTop = Math.max(0, lineTop - scroller.clientHeight / 3);
+  }
+}
+
+function buildGuidedReaders() {
+  document.querySelectorAll(".source-viewer").forEach((viewer) => {
+    const map = viewer.previousElementSibling;
+    if (!map?.classList.contains("code-reading-map")) return;
+    const buttons = [...map.querySelectorAll(`[data-focus-source="${viewer.id}"]`)];
+    if (!buttons.length) return;
+    const reader = document.createElement("div");
+    reader.className = "guided-code";
+    reader.setAttribute("aria-label", "Guided source explanation and exact code");
+    map.before(reader);
+    reader.append(map, viewer);
+    viewer.open = true;
+    map.setAttribute("aria-label", "Choose an explanation to highlight its exact code lines");
+    buttons.forEach((button) => {
+      button.type = "button";
+      button.setAttribute("aria-controls", viewer.id);
+      button.setAttribute("aria-pressed", "false");
+      button.addEventListener("mouseenter", () => focusSourceRange(viewer, button));
+      button.addEventListener("focus", () => focusSourceRange(viewer, button));
+      button.addEventListener("click", async () => {
+        await loadSource(viewer);
+        viewer.open = true;
+        focusSourceRange(viewer, button, { scroll: true });
+      });
+    });
+    loadSource(viewer);
+  });
+}
+
 const sourceLoads = new Map();
 
 function loadSource(viewer) {
@@ -99,19 +155,16 @@ document.querySelectorAll("[data-python-source]").forEach((viewer) => {
   }
 });
 
+buildGuidedReaders();
+
 document.querySelectorAll("[data-focus-source]").forEach((button) => {
+  if (button.closest(".guided-code")) return;
   button.addEventListener("click", async () => {
     const target = document.querySelector(`#${button.dataset.focusSource}`);
     const viewer = target ? await loadSource(target) : null;
     if (!viewer || viewer.classList.contains("source-load-failed")) return;
-    const [start, end = start] = button.dataset.lines.split("-").map(Number);
-    viewer.querySelectorAll(".source-line").forEach((line) => {
-      const number = Number(line.dataset.line);
-      line.classList.toggle("is-focused", number >= start && number <= end);
-    });
-    const first = viewer.querySelector(`.source-line[data-line="${start}"]`);
     viewer.open = true;
-    first?.scrollIntoView({ behavior: "smooth", block: "center" });
+    focusSourceRange(viewer, button, { scroll: true });
   });
 });
 
@@ -142,5 +195,10 @@ document.querySelectorAll(".lesson-section, .checkpoint-card, .chapter-pager").f
 });
 
 if (location.hash) {
-  requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView());
+  const scrollToChapterAnchor = () => {
+    document.getElementById(location.hash.slice(1))?.scrollIntoView();
+  };
+  requestAnimationFrame(scrollToChapterAnchor);
+  // Opening guided readers changes page height; settle the anchor again after their source loads.
+  Promise.allSettled(sourceLoads.values()).then(() => requestAnimationFrame(scrollToChapterAnchor));
 }
