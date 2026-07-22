@@ -214,7 +214,7 @@ function loadSource(viewer) {
     })
     .catch(() => {
       status.innerHTML =
-        'Source loading needs the local course server. Run <code>python3 -m http.server 8000</code> from the repository root, then reopen this page through <code>localhost:8000</code>.';
+        'Source loading needs the local course server. Run <code>make serve</code> from the repository root, then reopen this page through <code>localhost:8000</code>.';
       viewer.classList.add("source-load-failed");
       return viewer;
     });
