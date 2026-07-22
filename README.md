@@ -19,8 +19,8 @@ This project turns that loop into readable Python and real commands.
 The site uses plain HTML, CSS, and JavaScript. It has no build step or web framework.
 
 ```bash
-python3 -m http.server 8000
-open http://localhost:8000/site/
+make serve
+open http://localhost:8000/
 ```
 
 Or use the [published course](https://alex-alecu.github.io/llm-tutorial/).
